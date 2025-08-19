@@ -24,7 +24,6 @@ OfficeTrackr is a fullstack calendar and event management platform designed for 
 - Node.js (v18+ recommended)
 - MongoDB instance (local or cloud)
 
-
 ## How to Run
 
 ### Option 1: Using Shell Commands (Local Development)
