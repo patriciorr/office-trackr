@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:7
+    container_name: calendar-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: calendar-app
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  backend:
+    build: ./backend
+    container_name: calendar-backend
+    restart: always
+    environment:
+      - MONGO_URI=mongodb://root:example@mongo:27017/calendar-app?authSource=admin
+      - JWT_SECRET=supersecretkey
+      - PORT=5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    container_name: calendar-frontend
+    restart: always
+    environment:
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    # volumes:
+    #   - ./frontend:/app
+
+volumes:
+  mongo_data:

@@ -1,0 +1,86 @@
+{
+  "info": {
+    "_postman_id": "calendar-app-collection-001",
+    "name": "Calendar App API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"test1234\",\n  \"role\": \"coworker\"\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/users/register", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "users", "register"] }
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"test1234\"\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/auth/login", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "auth", "login"] }
+      }
+    },
+    {
+      "name": "Get All Users (admin/manager)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:5000/api/users/", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "users"] }
+      }
+    },
+    {
+      "name": "Create Calendar Event",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"date\": \"2025-07-10\",\n  \"type\": \"office\",\n  \"note\": \"Voy a la oficina\"\n}"
+        },
+        "url": { "raw": "http://localhost:5000/api/calendar/", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "calendar"] }
+      }
+    },
+    {
+      "name": "Get My Calendar Events",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:5000/api/calendar/user/{{userId}}", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "calendar", "user", "{{userId}}"] }
+      }
+    },
+    {
+      "name": "Get All Calendar Events (admin/manager)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:5000/api/calendar/", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "calendar"] }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" }
+  ]
+}
