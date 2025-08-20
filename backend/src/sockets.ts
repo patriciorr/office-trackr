@@ -1,13 +1,13 @@
-import { Server } from "socket.io";
+import {Server} from 'socket.io';
 
 let io: Server | null = null;
 
 export function initSocket(server: any) {
   io = new Server(server, {
-    cors: { origin: "*" },
+    cors: {origin: '*'},
   });
-  io.on("connection", (socket) => {
-    // Puedes añadir lógica de autenticación aquí si lo deseas
+  io.on('connection', socket => {
+    // Add authentication logic here
   });
 }
 

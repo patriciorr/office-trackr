@@ -1,5 +1,4 @@
-# Dockerfile para backend Node.js/Express/TypeScript
-FROM node:20
+FROM node:24-alpine
 
 WORKDIR /app
 

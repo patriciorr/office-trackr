@@ -13,13 +13,13 @@ export class AppError extends Error {
 export class ValidationError extends AppError {
   constructor(message: string) {
     super(message, 400, true);
-    this.name = "ValidationError";
+    this.name = 'ValidationError';
   }
 }
 
 export class AuthError extends AppError {
   constructor(message: string) {
     super(message, 401, true);
-    this.name = "AuthError";
+    this.name = 'AuthError';
   }
 }

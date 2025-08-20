@@ -1,22 +1,24 @@
-import { Schema, model, Document, Types } from "mongoose";
+import {Schema, model, Document, Types} from 'mongoose';
 
 export interface IEvent extends Document {
-  user: Types.ObjectId;
+  id: string;
+  userId: string;
   date: Date;
-  type: "office" | "vacation";
+  type: 'office' | 'vacation';
 }
 
 const eventSchema = new Schema<IEvent>(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    date: { type: Date, required: true },
+    id: {type: String, required: true, unique: true},
+    userId: {type: String, required: true},
+    date: {type: Date, required: true},
     type: {
       type: String,
-      enum: ["office", "vacation"],
+      enum: ['office', 'vacation'],
       required: true,
     },
   },
-  { timestamps: true }
+  {timestamps: true}
 );
 
-export default model<IEvent>("Event", eventSchema);
+export default model<IEvent>('Event', eventSchema);
