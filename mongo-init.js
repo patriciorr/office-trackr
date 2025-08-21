@@ -1,10 +1,10 @@
 var crypto = require("crypto");
 
-db = db.getSiblingDB("calendar-app");
+db = db.getSiblingDB("office-trackr");
 db.createUser({
-  user: "calendaruser",
-  pwd: "calendarpass",
-  roles: [{ role: "readWrite", db: "calendar-app" }],
+  user: "officetrackruser",
+  pwd: "officetrackrpass",
+  roles: [{ role: "readWrite", db: "office-trackr" }],
 });
 
 if (!db.users.findOne({ email: "admin@admin.com" })) {

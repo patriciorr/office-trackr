@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
-import MonthEventCounter from "./components/MonthEventCounter";
+import Counter from "./components/Counter";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import CalendarWorkdays from "./components/CalendarWorkdays";
-import { CalendarEvent } from "./components/Calendar";
+import Calendar, { CalendarEvent } from "./components/Calendar";
 import DayEventModal from "./components/DayEventModal";
-import { io } from "socket.io-client";
 import Navbar from "./components/Navbar";
 import ManagerDashboard from "./components/ManagerDashboard";
 import AdminPanel from "./components/AdminPanel";
@@ -44,7 +42,6 @@ const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [showRegister, setShowRegister] = useState(false);
-  // Solo eventos filtrados por mes
   const [monthEvents, setMonthEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -57,19 +54,18 @@ const App: React.FC = () => {
     type: "success" | "error";
     message: string;
   } | null>(null);
-  // Identificadores de pestañas: 'calendar', 'dashboard', 'admin'
-  const [activeTab, setActiveTab] = useState<'calendar' | 'dashboard' | 'admin'>("calendar");
+  const [activeTab, setActiveTab] = useState<
+    "calendar" | "dashboard" | "admin"
+  >("calendar");
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [selectedRange, setSelectedRange] = useState<[Date, Date] | undefined>(
     undefined
   );
-  // Estado para mes/año actual del calendario
   const today = new Date();
   const [calendarMonth, setCalendarMonth] = useState<number>(today.getMonth()); // 0-indexed
   const [calendarYear, setCalendarYear] = useState<number>(today.getFullYear());
   const [workerSummaries, setWorkerSummaries] = useState<WorkerSummary[]>([]);
 
-  // Restaurar sesión desde localStorage al cargar la app
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
@@ -79,7 +75,6 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Sincronizar idioma de i18n y persistir modo oscuro/idioma en localStorage
   useEffect(() => {
     i18n.changeLanguage(language);
     localStorage.setItem("language", language);
@@ -89,16 +84,12 @@ const App: React.FC = () => {
     localStorage.setItem("isDarkMode", isDarkMode ? "true" : "false");
   }, [isDarkMode]);
 
-  // Cargar eventos del backend al iniciar sesión
-  // Elimina allEvents y la lógica de eventos globales
-
-  // Cargar eventos filtrados por mes/año para el contador
   useEffect(() => {
     if (token && user) {
       const params = new URLSearchParams({
-        userId: user._id,
+        userId: user.id,
         year: calendarYear.toString(),
-        month: (calendarMonth + 1).toString(), // backend espera 1-12
+        month: (calendarMonth + 1).toString(),
       });
       fetch(`http://localhost:5000/api/events?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -109,13 +100,10 @@ const App: React.FC = () => {
     }
   }, [token, user, calendarYear, calendarMonth]);
 
-  // Simulación de roles, reemplazar por lógica real
   const role = user?.role || "coworker";
-
   useEffect(() => {
     if (activeTab === t("dashboard") && role === "manager") {
-      // Aquí iría la llamada real al backend para obtener los resúmenes
-      // Ejemplo de datos simulados:
+      // TODO: Replace with real logic
       setWorkerSummaries([
         {
           userId: "1",
@@ -142,7 +130,6 @@ const App: React.FC = () => {
     }
   }, [activeTab, role]);
 
-  // Guardar sesión en localStorage al login
   const handleLogin = (token: string, user: any) => {
     setToken(token);
     setUser(user);
@@ -150,7 +137,6 @@ const App: React.FC = () => {
     localStorage.setItem("user", JSON.stringify(user));
   };
 
-  // Logout seguro y limpieza de sesión
   const handleLogout = () => {
     setToken(null);
     setUser(null);
@@ -158,7 +144,6 @@ const App: React.FC = () => {
     localStorage.removeItem("user");
   };
 
-  // Expiración automática del token (según estándar JWT)
   useEffect(() => {
     if (!token) return;
     try {
@@ -194,7 +179,6 @@ const App: React.FC = () => {
     localStorage.setItem("user", JSON.stringify(user));
   };
 
-  // Abrir modal al hacer click en un día
   const handleSelectDay = (date: Date) => {
     const isoDate = date.toISOString().slice(0, 10);
     setModalDate(isoDate);
@@ -210,18 +194,17 @@ const App: React.FC = () => {
     setModalOpen(true);
   };
 
+  // TODO: Implement range selection
   const handleSelectRange = (start: Date, end: Date) => {
-    // Para el prototipo, solo abrimos el modal para el rango inicial
     handleSelectDay(start);
   };
 
-  // Guardar evento (añadir o editar)
   const handleSaveEvent = async (event: CalendarEvent) => {
     try {
       const method = modalMode === "edit" ? "PUT" : "POST";
       const url =
         modalMode === "edit"
-          ? `http://localhost:5000/api/events/${event._id}`
+          ? `http://localhost:5000/api/events/${event.id}`
           : "http://localhost:5000/api/events";
       const res = await fetch(url, {
         method,
@@ -234,11 +217,11 @@ const App: React.FC = () => {
       if (!res.ok) throw new Error("Error guardando evento");
       setFeedback({
         type: "success",
-        message: "Evento guardado correctamente.",
+        message: t("event_saved"),
       });
-      // Recargar eventos filtrados tras guardar
+
       const params = new URLSearchParams({
-        userId: user._id,
+        userId: user.id,
         year: calendarYear.toString(),
         month: (calendarMonth + 1).toString(),
       });
@@ -250,19 +233,18 @@ const App: React.FC = () => {
       );
       setMonthEvents(await updated.json());
     } catch {
-      setFeedback({ type: "error", message: "Error guardando evento" });
+      setFeedback({ type: "error", message: t("event_error") });
     }
     setModalOpen(false);
     setSelectedDate(null);
     setModalEvent(undefined);
   };
 
-  // Eliminar evento
   const handleDeleteEvent = async () => {
     try {
       if (!modalEvent) return;
       const res = await fetch(
-        `http://localhost:5000/api/events/${modalEvent._id}`,
+        `http://localhost:5000/api/events/${modalEvent.id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -271,11 +253,11 @@ const App: React.FC = () => {
       if (!res.ok) throw new Error("Error eliminando evento");
       setFeedback({
         type: "success",
-        message: "Evento eliminado correctamente.",
+        message: t("event_deleted"),
       });
-      // Recargar eventos filtrados tras eliminar
+
       const params = new URLSearchParams({
-        userId: user._id,
+        userId: user.id,
         year: calendarYear.toString(),
         month: (calendarMonth + 1).toString(),
       });
@@ -287,20 +269,20 @@ const App: React.FC = () => {
       );
       setMonthEvents(await updated.json());
     } catch {
-      setFeedback({ type: "error", message: "Error eliminando evento" });
+      setFeedback({ type: "error", message: t("delete_error") });
     }
     setModalOpen(false);
     setSelectedDate(null);
     setModalEvent(undefined);
   };
 
-  // Cerrar modal
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedDate(null);
     setModalEvent(undefined);
   };
 
+  // TODO: Implement holiday addition
   const handleAddHoliday = async (date: string) => {
     try {
       const res = await fetch("http://localhost:5000/api/events", {
@@ -313,9 +295,9 @@ const App: React.FC = () => {
       });
       if (!res.ok) throw new Error("Error agregando festivo");
       setFeedback({ type: "success", message: "Festivo nacional agregado." });
-      // Recargar eventos filtrados tras agregar festivo
+
       const params = new URLSearchParams({
-        userId: user._id,
+        userId: user.id,
         year: calendarYear.toString(),
         month: (calendarMonth + 1).toString(),
       });
@@ -331,6 +313,7 @@ const App: React.FC = () => {
     }
   };
 
+  // TODO: Implement concentration addition
   const handleAddConcentration = async (date: string, note?: string) => {
     try {
       const res = await fetch("http://localhost:5000/api/events", {
@@ -346,9 +329,9 @@ const App: React.FC = () => {
         type: "success",
         message: "Día de concentración agregado.",
       });
-      // Recargar eventos filtrados tras agregar concentración
+
       const params = new URLSearchParams({
-        userId: user._id,
+        userId: user.id,
         year: calendarYear.toString(),
         month: (calendarMonth + 1).toString(),
       });
@@ -461,7 +444,6 @@ const App: React.FC = () => {
         onToggleDarkMode={() => setIsDarkMode((v) => !v)}
         role={role}
         onTabChange={(tab) => {
-          // Solo permite los tabs válidos
           if (["calendar", "dashboard", "admin"].includes(tab)) {
             setActiveTab(tab as "calendar" | "dashboard" | "admin");
           }
@@ -488,20 +470,18 @@ const App: React.FC = () => {
                 gap: 3,
               }}
             >
-              {/* Contador de eventos mensual */}
               <Box
                 sx={{ width: { xs: "100%", md: "33%" }, mb: { xs: 2, md: 0 } }}
               >
-                <MonthEventCounter
+                <Counter
                   events={monthEvents}
                   year={calendarYear}
                   month={calendarMonth}
                   isDarkMode={isDarkMode}
                 />
               </Box>
-              {/* Calendario principal */}
               <Box sx={{ flex: 1, width: { xs: "100%", md: "67%" } }}>
-                <CalendarWorkdays
+                <Calendar
                   events={monthEvents}
                   onSelectDay={handleSelectDay}
                   isDarkMode={isDarkMode}

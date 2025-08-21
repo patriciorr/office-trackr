@@ -6,7 +6,6 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
-import ReactCountryFlag from "react-country-flag";
 
 interface LoginProps {
   onLogin: (token: string, user: any) => void;
@@ -43,7 +42,13 @@ const Login: React.FC<LoginProps> = ({
       if (!res.ok) throw new Error(data.error || t("login_failed"));
       onLogin(data.token, data.user);
     } catch (err: any) {
-      setError(err.message);
+      if (err.message.includes("AUTH001")) {
+        setError(t("user_not_found"));
+      } else if (err.message.includes("AUTH002")) {
+        setError(t("invalid_credentials"));
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }

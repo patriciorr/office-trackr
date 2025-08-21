@@ -1,19 +1,18 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import type { CalendarEvent } from "./Calendar";
-import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
+import { CalendarEvent } from "./Calendar";
 
-interface MonthEventCounterProps {
+interface CounterProps {
   events: CalendarEvent[];
   year: number;
   month: number; // 0-indexed
   isDarkMode?: boolean;
 }
 
-const MonthEventCounter: React.FC<MonthEventCounterProps> = ({
+const Counter: React.FC<CounterProps> = ({
   events,
   year,
   month,
@@ -38,7 +37,6 @@ const MonthEventCounter: React.FC<MonthEventCounterProps> = ({
     return days;
   }
 
-  // Los eventos ya están filtrados por mes, solo filtra por tipo
   const officeDaysArr = events.filter(
     (e: CalendarEvent) => e.type === "office"
   );
@@ -48,45 +46,43 @@ const MonthEventCounter: React.FC<MonthEventCounterProps> = ({
   const officeDays = officeDaysArr.length;
   const vacationDays = vacationDaysArr.length;
 
-  // Laborables del mes (lunes a viernes)
   const laborDays = getLaborDays(year, month);
-  // Laborables sin vacaciones (solo lunes a viernes)
+
   const vacationDates = vacationDaysArr.map((e) => e.date.slice(0, 10));
   const officeDates = officeDaysArr.map((e) => e.date.slice(0, 10));
   const laborDaysNoVacation = laborDays.filter(
     (d) => !vacationDates.includes(d)
   );
-  // Días de teletrabajo = laborables sin oficina ni vacaciones
+
   const teleworkDays = laborDaysNoVacation.filter(
     (d) => !officeDates.includes(d)
   ).length;
-  // Progreso: 40% de laborDaysNoVacation
+
   const rawRequired = laborDaysNoVacation.length * 0.4;
   const requiredOfficeDays =
     rawRequired % 1 < 0.5 ? Math.floor(rawRequired) : Math.ceil(rawRequired);
-  // Porcentaje de cumplimiento sobre el objetivo obligatorio (máx 100%)
+
   const percentOfRequired =
     requiredOfficeDays === 0
       ? 0
       : Math.round(Math.min(officeDays / requiredOfficeDays, 1) * 100);
-  // Porcentaje de días de oficina sobre el total de laborables sin vacaciones (máx 100%)
+
   const percentOfLaborDays =
     laborDaysNoVacation.length === 0
       ? 0
       : Math.round(Math.min(officeDays / laborDaysNoVacation.length, 1) * 100);
 
-  // Color del círculo según porcentaje de días de oficina sobre laborables sin vacaciones
-  let circleColor = "#e53935"; // rojo
+  let circleColor = "#e53935";
   if (percentOfRequired === 100) {
-    circleColor = "#43a047"; // verde
+    circleColor = "#43a047";
   } else if (percentOfLaborDays >= 40) {
-    circleColor = "#43a047"; // verde
+    circleColor = "#43a047";
   } else if (percentOfLaborDays >= 30) {
-    circleColor = "#ffd600"; // amarillo
+    circleColor = "#ffd600";
   } else if (percentOfLaborDays >= 20) {
-    circleColor = "#ffa726"; // naranja amarillento
+    circleColor = "#ffa726";
   } else if (percentOfLaborDays >= 10) {
-    circleColor = "#ff7043"; // naranja rojizo
+    circleColor = "#ff7043";
   }
 
   return (
@@ -157,4 +153,4 @@ const MonthEventCounter: React.FC<MonthEventCounterProps> = ({
   );
 };
 
-export default MonthEventCounter;
+export default Counter;

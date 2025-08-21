@@ -27,7 +27,8 @@ const Register: React.FC<RegisterProps> = ({
   onToggleDarkMode,
 }) => {
   const { t } = useTranslation();
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("coworker");
@@ -62,7 +63,7 @@ const Register: React.FC<RegisterProps> = ({
       const res = await fetch("http://localhost:5000/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role }),
+        body: JSON.stringify({ firstName, lastName, email, password, role }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t("register_failed"));
@@ -76,7 +77,33 @@ const Register: React.FC<RegisterProps> = ({
       if (!loginRes.ok) throw new Error(loginData.error || t("login_failed"));
       onRegister(loginData.token, loginData.user);
     } catch (err: any) {
-      setError(err.message);
+      if (err.message.includes("FN001")) {
+        setError(t("first_name_required"));
+      } else if (err.message.includes("FN002")) {
+        setError(t("first_name_length"));
+      } else if (err.message.includes("FN003")) {
+        setError(t("first_name_format"));
+      } else if (err.message.includes("LN001")) {
+        setError(t("last_name_required"));
+      } else if (err.message.includes("LN002")) {
+        setError(t("last_name_length"));
+      } else if (err.message.includes("LN003")) {
+        setError(t("last_name_format"));
+      } else if (err.message.includes("EM001")) {
+        setError(t("email_required"));
+      } else if (err.message.includes("EM002")) {
+        setError(t("email_format"));
+      } else if (err.message.includes("EM003")) {
+        setError(t("email_registered"));
+      } else if (err.message.includes("PW001")) {
+        setError(t("password_required"));
+      } else if (err.message.includes("PW002")) {
+        setError(t("password_strength"));
+      } else if (err.message.includes("PW003")) {
+        setError(t("password_common"));
+      } else {
+        setError(err.message);
+      }
       setLoading(false);
     }
   };
@@ -110,13 +137,24 @@ const Register: React.FC<RegisterProps> = ({
           margin="normal"
           required
           fullWidth
-          id="name"
-          label={t("name")}
-          name="name"
-          autoComplete="name"
+          id="firstName"
+          label={t("first_name")}
+          name="firstName"
+          autoComplete="firstName"
           autoFocus
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value.trim())}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="lastName"
+          label={t("last_name")}
+          name="lastName"
+          autoComplete="lastName"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value.trim())}
         />
         <TextField
           margin="normal"
@@ -127,7 +165,7 @@ const Register: React.FC<RegisterProps> = ({
           name="email"
           autoComplete="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value.trim())}
         />
         <TextField
           margin="normal"
@@ -139,17 +177,21 @@ const Register: React.FC<RegisterProps> = ({
           id="password"
           autoComplete="current-password"
           value={password}
-          onChange={(e) => handlePasswordChange(e.target.value)}
+          onChange={(e) => handlePasswordChange(e.target.value.trim())}
         />
         <Box sx={{ mt: 2, mb: 2 }}>
           <ul style={{ paddingLeft: 18, margin: 0 }}>
             <li style={{ color: passwordChecks.length ? "#888" : "#d0d0d0" }}>
               {t("password_length")}
             </li>
-            <li style={{ color: passwordChecks.uppercase ? "#888" : "#d0d0d0" }}>
+            <li
+              style={{ color: passwordChecks.uppercase ? "#888" : "#d0d0d0" }}
+            >
               {t("password_uppercase")}
             </li>
-            <li style={{ color: passwordChecks.lowercase ? "#888" : "#d0d0d0" }}>
+            <li
+              style={{ color: passwordChecks.lowercase ? "#888" : "#d0d0d0" }}
+            >
               {t("password_lowercase")}
             </li>
             <li style={{ color: passwordChecks.number ? "#888" : "#d0d0d0" }}>

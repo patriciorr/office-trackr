@@ -34,7 +34,6 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Los tabs usan identificadores, el label se traduce
   const tabs = [
     {
       label: t("calendar"),
@@ -102,7 +101,6 @@ const Navbar: React.FC<NavbarProps> = ({
               </span>
             )}
           </Button>
-          {/* Language toggle with flags using MUI ToggleButtonGroup */}
           <ToggleButtonGroup
             value={language}
             exclusive

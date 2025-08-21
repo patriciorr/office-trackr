@@ -1,117 +1,116 @@
-import React, { JSX, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { DateCalendar, PickersDay, PickersDayProps } from "@mui/x-date-pickers";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+
+export type CalendarEventType = "office" | "vacation";
 
 export interface CalendarEvent {
-  _id?: string;
+  id?: string;
   date: string; // YYYY-MM-DD
   type: CalendarEventType;
 }
 
 interface CalendarProps {
   events: CalendarEvent[];
-  onDayClick: (date: string) => void;
+  onSelectDay: (date: Date) => void;
+  onMonthChange?: (year: number, month: number) => void;
   isDarkMode?: boolean;
 }
 
-// Tipos para los días y eventos
-export type CalendarEventType = 'office' | 'vacation';
+function CustomDay(props: PickersDayProps & { events: CalendarEvent[] }) {
+  const { day, events, ...other } = props;
 
-export interface CalendarEvent {
-  _id?: string;
-  date: string; // YYYY-MM-DD
-  type: CalendarEventType;
-}
-
-// Utilidad para obtener los días del mes
-function getDaysInMonth(year: number, month: number) {
-  const date = new Date(year, month, 1);
-  const days = [];
-  while (date.getMonth() === month) {
-    days.push(new Date(date));
-    date.setDate(date.getDate() + 1);
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  const dateStr = `${day.getFullYear()}-${pad(day.getMonth() + 1)}-${pad(
+    day.getDate()
+  )}`;
+  const event = events.find((e: any) => {
+    const eventDate =
+      typeof e.date === "string"
+        ? e.date.slice(0, 10)
+        : `${e.date.getFullYear()}-${pad(e.date.getMonth() + 1)}-${pad(
+            e.date.getDate()
+          )}`;
+    return eventDate === dateStr;
+  });
+  let sx = {};
+  if (event?.type === "office") {
+    sx = {
+      backgroundColor: "#e53935",
+      color: "#fff",
+      "&:hover": {
+        backgroundColor: "#d32f2f",
+      },
+    };
+  } else if (event?.type === "vacation") {
+    sx = {
+      backgroundColor: "#43a047",
+      color: "#fff",
+      "&:hover": {
+        backgroundColor: "#388e3c",
+      },
+    };
   }
-  return days;
+  return <PickersDay day={day} {...other} sx={sx} />;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ events, onDayClick, isDarkMode = false }) => {
-  const today = new Date();
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+const Calendar: React.FC<CalendarProps> = ({
+  events = [],
+  onSelectDay,
+  onMonthChange,
+  isDarkMode = false,
+}) => {
+  const [selectedDate, setSelectedDate] = React.useState<Date | null>(
+    new Date()
+  );
+  const [currentMonth, setCurrentMonth] = React.useState<number>(
+    new Date().getMonth()
+  );
+  const [currentYear, setCurrentYear] = React.useState<number>(
+    new Date().getFullYear()
+  );
 
-  const days = getDaysInMonth(currentYear, currentMonth);
-
-  // Mapeo de eventos por fecha
-  const eventMap = events.reduce((acc, ev) => {
-    acc[ev.date] = ev;
-    return acc;
-  }, {} as Record<string, CalendarEvent>);
-
-  // Navegación de meses
-  const prevMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else {
-      setCurrentMonth(currentMonth - 1);
-    }
-  };
-  const nextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else {
-      setCurrentMonth(currentMonth + 1);
+  const handleMonthChange = (date: Date) => {
+    setCurrentMonth(date.getMonth());
+    setCurrentYear(date.getFullYear());
+    if (typeof onMonthChange === "function") {
+      onMonthChange(date.getFullYear(), date.getMonth());
     }
   };
 
   const { t } = useTranslation();
-  const months = t('months', { returnObjects: true }) as string[];
-  const daysOfWeek = t('days', { returnObjects: true }) as string[];
-  const monthName = months[currentMonth];
   return (
-  <div style={{ background: isDarkMode ? '#232946' : '#fff', color: isDarkMode ? '#eaf0fa' : '#232946', borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', padding: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <button onClick={prevMonth}>{'<'}</button>
-        <h3>{monthName} {currentYear}</h3>
-        <button onClick={nextMonth}>{'>'}</button>
-      </div>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            {daysOfWeek.map(d => <th key={d}>{d}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {/* Renderizar las semanas */}
-          {(() => {
-            const weeks: JSX.Element[] = [];
-            let week: JSX.Element[] = [];
-            let dayOfWeek = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7; // Lunes=0
-            for (let i = 0; i < dayOfWeek; i++) week.push(<td key={'empty-' + i}></td>);
-            days.forEach((date, idx) => {
-              const dateStr = date.toISOString().slice(0, 10);
-              const event = eventMap[dateStr];
-              week.push(
-                <td
-                  key={dateStr}
-                  style={{ border: '1px solid #ccc', cursor: 'pointer', background: event ? (event.type === 'office' ? '#d1e7dd' : event.type === 'vacation' ? '#f8d7da' : '#cff4fc') : undefined }}
-                  title={event ? t(event.type) : ''}
-                  onClick={() => onDayClick(dateStr)}
-                >
-                  {date.getDate()}
-                </td>
-              );
-              if ((week.length === 7) || (idx === days.length - 1)) {
-                weeks.push(<tr key={'week-' + weeks.length}>{week}</tr>);
-                week = [];
-              }
-            });
-            return weeks;
-          })()}
-        </tbody>
-      </table>
-    </div>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        py: 2,
+        background: isDarkMode ? "#232946" : "#fff",
+        color: isDarkMode ? "#eaf0fa" : "#232946",
+        borderRadius: 3,
+        boxShadow: 3,
+      }}
+    >
+      <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+        {t("calendar")}
+      </Typography>
+      <DateCalendar
+        value={selectedDate}
+        onChange={(date) => {
+          setSelectedDate(date);
+          if (date) onSelectDay(date as Date);
+        }}
+        onMonthChange={handleMonthChange}
+        slots={{
+          day: (props: any) => <CustomDay {...props} events={events} />,
+        }}
+        sx={{ width: "100%" }}
+      />
+    </Box>
   );
 };
 
-  export default Calendar;
+export default Calendar;

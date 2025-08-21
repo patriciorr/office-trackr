@@ -13,12 +13,12 @@ export default class AuthService {
     const user = (await this.userRepository.findByEmail(email, true)) as IUser | null;
     if (!user) {
       logger.warn(`Login failed - user not found: ${email}`);
-      throw new AuthError('User not found');
+      throw new AuthError('AUTH001 - User not found');
     }
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
       logger.warn(`Login failed - invalid credentials: ${email}`);
-      throw new AuthError('Invalid credentials');
+      throw new AuthError('AUTH002 - Invalid credentials');
     }
     const token = jwt.sign({id: user.id, role: user.role}, process.env.JWT_SECRET as string, {expiresIn: '1d'});
     return {
