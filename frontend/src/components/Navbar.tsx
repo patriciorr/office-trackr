@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import ReactCountryFlag from "react-country-flag";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
@@ -33,17 +39,48 @@ const Navbar: React.FC<NavbarProps> = ({
   minimal = false,
 }) => {
   const { t } = useTranslation();
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEditUser = () => {
+    navigate("/edit-user");
+    setAnchorEl(null);
+  };
+
+  const handleLogoutClick = () => {
+    if (onLogout) onLogout();
+    setAnchorEl(null);
+  };
+
+  const handleLogoClick = () => {
+    navigate("/");
+    if (onTabChange) onTabChange("calendar");
+  };
 
   const tabs = [
-    {
-      label: t("calendar"),
-      value: "calendar",
-    },
+    { label: t("calendar"), value: "calendar" },
     ...(role === "manager"
       ? [{ label: t("dashboard"), value: "dashboard" }]
       : []),
     ...(role === "admin" ? [{ label: t("admin"), value: "admin" }] : []),
   ];
+
+  const handleTabClick = (tab: string) => {
+    if (onTabChange) onTabChange(tab);
+    if (tab === "calendar") navigate("/");
+    else if (tab === "dashboard") navigate("/dashboard");
+    else if (tab === "admin") navigate("/admin");
+  };
+
   return (
     <AppBar
       position="static"
@@ -52,8 +89,17 @@ const Navbar: React.FC<NavbarProps> = ({
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <img src="/agenda.png" alt="Logo" style={{ height: 32 }} />
-          <Typography variant="h6" sx={{ fontWeight: 700, color: "#555" }}>
+          <img
+            src="/agenda.png"
+            alt="Logo"
+            style={{ height: 32, cursor: "pointer" }}
+            onClick={handleLogoClick}
+          />
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: "#555", cursor: "pointer" }}
+            onClick={handleLogoClick}
+          >
             {t("app_name", { defaultValue: "OfficeTrackr" })}
           </Typography>
         </Box>
@@ -62,7 +108,7 @@ const Navbar: React.FC<NavbarProps> = ({
             tabs.map((tab, idx) => (
               <Button
                 key={tab.value}
-                onClick={() => onTabChange && onTabChange(tab.value)}
+                onClick={() => handleTabClick(tab.value)}
                 color={activeTab === tab.value ? "primary" : "inherit"}
                 sx={{
                   fontWeight: activeTab === tab.value ? 700 : 400,
@@ -74,16 +120,6 @@ const Navbar: React.FC<NavbarProps> = ({
                 {tab.label}
               </Button>
             ))}
-          {!minimal && onLogout && (
-            <Button
-              onClick={onLogout}
-              variant="contained"
-              color="primary"
-              sx={{ fontWeight: 600, ml: 2 }}
-            >
-              {t("logout")}
-            </Button>
-          )}
           <Button
             onClick={onToggleDarkMode}
             variant="outlined"
@@ -132,6 +168,25 @@ const Navbar: React.FC<NavbarProps> = ({
               />
             </ToggleButton>
           </ToggleButtonGroup>
+          {user && (
+            <>
+              <IconButton onClick={handleAvatarClick} sx={{ ml: 2 }}>
+                <Avatar sx={{ bgcolor: "#1976d2", width: 32, height: 32 }}>
+                  {`${user.firstName?.[0] ?? "U"}${user.lastName?.[0] ?? "N"}`}
+                </Avatar>
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
+              >
+                <MenuItem onClick={handleEditUser}>{t("edit_user")}</MenuItem>
+                <MenuItem onClick={handleLogoutClick}>{t("logout")}</MenuItem>
+              </Menu>
+            </>
+          )}
         </Box>
       </Toolbar>
     </AppBar>

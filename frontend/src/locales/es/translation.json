@@ -59,5 +59,10 @@
   "email_registered": "El correo electrónico ya está registrado",
   "password_required": "La contraseña es obligatoria",
   "password_strength": "La contraseña debe tener al menos 12 caracteres y incluir mayúsculas, minúsculas, números y símbolos",
-  "password_common": "La contraseña es demasiado común. Por favor, elige una contraseña diferente."
+  "password_common": "La contraseña es demasiado común. Por favor, elige una contraseña diferente.",
+  "edit_user": "Editar usuario",
+  "edit_button": "Guardar cambios",
+  "back": "Atrás",
+  "update_success": "Usuario actualizado correctamente.",
+  "update_failed": "Error al actualizar el usuario."
 }

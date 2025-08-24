@@ -59,5 +59,10 @@
   "email_registered": "Email is already registered",
   "password_required": "Password is required",
   "password_strength": "Password must be at least 12 characters long and include uppercase, lowercase, number, and symbol",
-  "password_common": "Password is too common. Please choose a different password."
+  "password_common": "Password is too common. Please choose a different password.",
+  "edit_user": "Edit user",
+  "edit_button": "Save changes",
+  "back": "Back",
+  "update_success": "User updated successfully.",
+  "update_failed": "Failed to update user."
 }

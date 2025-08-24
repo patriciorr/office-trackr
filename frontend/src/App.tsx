@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Counter from "./components/Counter";
 import Login from "./components/Login";
@@ -6,6 +7,8 @@ import Register from "./components/Register";
 import Calendar, { CalendarEvent } from "./components/Calendar";
 import DayEventModal from "./components/DayEventModal";
 import Navbar from "./components/Navbar";
+import UserEdit from "./components/UserEdit";
+import { AuthContext } from "./context/AuthContext";
 import ManagerDashboard from "./components/ManagerDashboard";
 import AdminPanel from "./components/AdminPanel";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -30,6 +33,8 @@ interface WorkerSummary {
 }
 
 const App: React.FC = () => {
+  const { user, setUser, updateUser } = useContext(AuthContext);
+  const role = user?.role || "coworker";
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState<"es" | "en">(() => {
     return (localStorage.getItem("language") as "es" | "en") || "es";
@@ -40,7 +45,6 @@ const App: React.FC = () => {
   });
 
   const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
   const [showRegister, setShowRegister] = useState(false);
   const [monthEvents, setMonthEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -100,7 +104,6 @@ const App: React.FC = () => {
     }
   }, [token, user, calendarYear, calendarMonth]);
 
-  const role = user?.role || "coworker";
   useEffect(() => {
     if (activeTab === t("dashboard") && role === "manager") {
       // TODO: Replace with real logic
@@ -130,11 +133,11 @@ const App: React.FC = () => {
     }
   }, [activeTab, role]);
 
-  const handleLogin = (token: string, user: any) => {
+  const handleLogin = (token: string, userObj: any) => {
     setToken(token);
-    setUser(user);
+    setUser(userObj);
     localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("user", JSON.stringify(userObj));
   };
 
   const handleLogout = () => {
@@ -153,17 +156,11 @@ const App: React.FC = () => {
         const now = Date.now();
         if (expMs < now) {
           handleLogout();
-          setFeedback({
-            type: "error",
-            message: t("expired"),
-          });
+          setFeedback({ type: "error", message: t("expired") });
         } else {
           const timeout = setTimeout(() => {
             handleLogout();
-            setFeedback({
-              type: "error",
-              message: t("expired"),
-            });
+            setFeedback({ type: "error", message: t("expired") });
           }, expMs - now);
           return () => clearTimeout(timeout);
         }
@@ -171,12 +168,12 @@ const App: React.FC = () => {
     } catch {}
   }, [token]);
 
-  const handleRegister = (token: string, user: any) => {
+  const handleRegister = (token: string, userObj: any) => {
     setShowRegister(false);
     setToken(token);
-    setUser(user);
+    setUser(userObj);
     localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("user", JSON.stringify(userObj));
   };
 
   const handleSelectDay = (date: Date) => {
@@ -200,6 +197,7 @@ const App: React.FC = () => {
   };
 
   const handleSaveEvent = async (event: CalendarEvent) => {
+    if (!token || !user) return;
     try {
       const method = modalMode === "edit" ? "PUT" : "POST";
       const url =
@@ -241,6 +239,7 @@ const App: React.FC = () => {
   };
 
   const handleDeleteEvent = async () => {
+    if (!token || !user) return;
     try {
       if (!modalEvent) return;
       const res = await fetch(
@@ -282,74 +281,6 @@ const App: React.FC = () => {
     setModalEvent(undefined);
   };
 
-  // TODO: Implement holiday addition
-  const handleAddHoliday = async (date: string) => {
-    try {
-      const res = await fetch("http://localhost:5000/api/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ date, type: "holiday" }),
-      });
-      if (!res.ok) throw new Error("Error agregando festivo");
-      setFeedback({ type: "success", message: "Festivo nacional agregado." });
-
-      const params = new URLSearchParams({
-        userId: user.id,
-        year: calendarYear.toString(),
-        month: (calendarMonth + 1).toString(),
-      });
-      const updated = await fetch(
-        `http://localhost:5000/api/events?${params.toString()}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setMonthEvents(await updated.json());
-    } catch {
-      setFeedback({ type: "error", message: "Error agregando festivo" });
-    }
-  };
-
-  // TODO: Implement concentration addition
-  const handleAddConcentration = async (date: string, note?: string) => {
-    try {
-      const res = await fetch("http://localhost:5000/api/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ date, type: "concentration", note }),
-      });
-      if (!res.ok) throw new Error("Error agregando día de concentración");
-      setFeedback({
-        type: "success",
-        message: "Día de concentración agregado.",
-      });
-
-      const params = new URLSearchParams({
-        userId: user.id,
-        year: calendarYear.toString(),
-        month: (calendarMonth + 1).toString(),
-      });
-      const updated = await fetch(
-        `http://localhost:5000/api/events?${params.toString()}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setMonthEvents(await updated.json());
-    } catch {
-      setFeedback({
-        type: "error",
-        message: "Error agregando día de concentración",
-      });
-    }
-  };
-
   const theme = createTheme({
     palette: {
       mode: isDarkMode ? "dark" : "light",
@@ -382,155 +313,166 @@ const App: React.FC = () => {
 
   if (!token) {
     return (
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Container maxWidth="sm" sx={{ py: 4 }}>
-          {showRegister ? (
-            <>
-              <Register
-                onRegister={handleRegister}
-                language={language}
-                onLanguageChange={(lang) => {
-                  setLanguage(lang);
-                  i18n.changeLanguage(lang);
-                }}
-                isDarkMode={isDarkMode}
-                onToggleDarkMode={() => setIsDarkMode((v) => !v)}
-              />
-              <Button
-                variant="text"
-                onClick={() => setShowRegister(false)}
-                sx={{ mt: 2 }}
-              >
-                {t("already_have_account")}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Login
-                onLogin={handleLogin}
-                language={language}
-                onLanguageChange={(lang) => {
-                  setLanguage(lang);
-                  i18n.changeLanguage(lang);
-                }}
-                isDarkMode={isDarkMode}
-                onToggleDarkMode={() => setIsDarkMode((v) => !v)}
-              />
-              <Button
-                variant="text"
-                onClick={() => setShowRegister(true)}
-                sx={{ mt: 2 }}
-              >
-                {t("no_account")}
-              </Button>
-            </>
-          )}
-        </Container>
-      </ThemeProvider>
+      <Router>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Container maxWidth="sm" sx={{ py: 4 }}>
+            {showRegister ? (
+              <>
+                <Register
+                  onRegister={handleRegister}
+                  language={language}
+                  onLanguageChange={(lang) => {
+                    setLanguage(lang);
+                    i18n.changeLanguage(lang);
+                  }}
+                  isDarkMode={isDarkMode}
+                  onToggleDarkMode={() => setIsDarkMode((v) => !v)}
+                />
+                <Button
+                  variant="text"
+                  onClick={() => setShowRegister(false)}
+                  sx={{ mt: 2 }}
+                >
+                  {t("already_have_account")}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Login
+                  onLogin={handleLogin}
+                  language={language}
+                  onLanguageChange={(lang) => {
+                    setLanguage(lang);
+                    i18n.changeLanguage(lang);
+                  }}
+                  isDarkMode={isDarkMode}
+                  onToggleDarkMode={() => setIsDarkMode((v) => !v)}
+                />
+                <Button
+                  variant="text"
+                  onClick={() => setShowRegister(true)}
+                  sx={{ mt: 2 }}
+                >
+                  {t("no_account")}
+                </Button>
+              </>
+            )}
+          </Container>
+        </ThemeProvider>
+      </Router>
     );
   }
 
   return (
-    <ThemeProvider
-      theme={{
-        ...theme,
-        ...(language === "es" ? muiLocales.es : muiLocales.en),
-      }}
-    >
-      <CssBaseline />
-      <Navbar
-        isDarkMode={isDarkMode}
-        onToggleDarkMode={() => setIsDarkMode((v) => !v)}
-        role={role}
-        onTabChange={(tab) => {
-          if (["calendar", "dashboard", "admin"].includes(tab)) {
-            setActiveTab(tab as "calendar" | "dashboard" | "admin");
-          }
+    <Router>
+      <ThemeProvider
+        theme={{
+          ...theme,
+          ...(language === "es" ? muiLocales.es : muiLocales.en),
         }}
-        activeTab={activeTab}
-        onLogout={handleLogout}
-        language={language}
-        onLanguageChange={(lang) => {
-          setLanguage(lang);
-          i18n.changeLanguage(lang);
-        }}
-      />
-      <LocalizationProvider
-        dateAdapter={AdapterDateFns}
-        adapterLocale={language === "es" ? esLocale : enLocale}
       >
-        <Container maxWidth="md" sx={{ py: 4 }}>
-          {activeTab === "calendar" && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: { xs: "column", md: "row" },
-                alignItems: { xs: "center", md: "flex-start" },
-                gap: 3,
-              }}
-            >
-              <Box
-                sx={{ width: { xs: "100%", md: "33%" }, mb: { xs: 2, md: 0 } }}
-              >
-                <Counter
-                  events={monthEvents}
-                  year={calendarYear}
-                  month={calendarMonth}
-                  isDarkMode={isDarkMode}
-                />
-              </Box>
-              <Box sx={{ flex: 1, width: { xs: "100%", md: "67%" } }}>
-                <Calendar
-                  events={monthEvents}
-                  onSelectDay={handleSelectDay}
-                  isDarkMode={isDarkMode}
-                  onMonthChange={(year: number, month: number) => {
-                    setCalendarYear(year);
-                    setCalendarMonth(month);
-                  }}
-                />
-              </Box>
-            </Box>
-          )}
-          {activeTab === "dashboard" && role === "manager" && (
-            <ManagerDashboard
-              summaries={workerSummaries}
-              isDarkMode={isDarkMode}
-            />
-          )}
-          {activeTab === "admin" && role === "admin" && (
-            <AdminPanel
-              onAddHoliday={handleAddHoliday}
-              onAddConcentration={handleAddConcentration}
-              isDarkMode={isDarkMode}
-            />
-          )}
-        </Container>
-      </LocalizationProvider>
-      {modalOpen && modalDate && (
-        <DayEventModal
-          date={modalDate}
-          event={modalEvent}
-          onSave={handleSaveEvent}
-          onDelete={modalEvent ? handleDeleteEvent : undefined}
-          onClose={handleCloseModal}
+        <CssBaseline />
+        <Navbar
           isDarkMode={isDarkMode}
+          onToggleDarkMode={() => setIsDarkMode((v) => !v)}
+          role={role}
+          onTabChange={(tab) => {
+            if (["calendar", "dashboard", "admin"].includes(tab)) {
+              setActiveTab(tab as "calendar" | "dashboard" | "admin");
+            }
+          }}
+          activeTab={activeTab}
+          onLogout={handleLogout}
+          language={language}
+          onLanguageChange={(lang) => {
+            setLanguage(lang);
+            i18n.changeLanguage(lang);
+          }}
         />
-      )}
-      <Snackbar
-        open={!!feedback}
-        autoHideDuration={4000}
-        onClose={() => setFeedback(null)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        {feedback ? (
-          <Alert severity={feedback.type} sx={{ width: "100%" }}>
-            {feedback.message}
-          </Alert>
-        ) : undefined}
-      </Snackbar>
-    </ThemeProvider>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                adapterLocale={language === "es" ? esLocale : enLocale}
+              >
+                <Container maxWidth="md" sx={{ py: 4 }}>
+                  {activeTab === "calendar" && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: { xs: "column", md: "row" },
+                        alignItems: { xs: "center", md: "flex-start" },
+                        gap: 3,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: { xs: "100%", md: "33%" },
+                          mb: { xs: 2, md: 0 },
+                        }}
+                      >
+                        <Counter
+                          events={monthEvents}
+                          year={calendarYear}
+                          month={calendarMonth}
+                          isDarkMode={isDarkMode}
+                        />
+                      </Box>
+                      <Box sx={{ flex: 1, width: { xs: "100%", md: "67%" } }}>
+                        <Calendar
+                          events={monthEvents}
+                          onSelectDay={handleSelectDay}
+                          isDarkMode={isDarkMode}
+                          onMonthChange={(year: number, month: number) => {
+                            setCalendarYear(year);
+                            setCalendarMonth(month);
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  )}
+                  {activeTab === "dashboard" && role === "manager" && (
+                    <ManagerDashboard
+                      summaries={workerSummaries}
+                      isDarkMode={isDarkMode}
+                    />
+                  )}
+                  {activeTab === "admin" && role === "admin" && (
+                    <AdminPanel isDarkMode={isDarkMode} />
+                  )}
+                </Container>
+              </LocalizationProvider>
+            }
+          />
+          <Route path="/edit-user" element={<UserEdit />} />
+        </Routes>
+        {modalOpen && modalDate && (
+          <DayEventModal
+            date={modalDate}
+            event={modalEvent}
+            onSave={handleSaveEvent}
+            onDelete={modalEvent ? handleDeleteEvent : undefined}
+            onClose={handleCloseModal}
+            isDarkMode={isDarkMode}
+          />
+        )}
+        <Snackbar
+          open={!!feedback}
+          autoHideDuration={4000}
+          onClose={() => setFeedback(null)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          {feedback ? (
+            <Alert severity={feedback.type} sx={{ width: "100%" }}>
+              {feedback.message}
+            </Alert>
+          ) : undefined}
+        </Snackbar>
+      </ThemeProvider>
+    </Router>
   );
 };
 

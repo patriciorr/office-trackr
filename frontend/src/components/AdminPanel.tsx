@@ -1,25 +1,12 @@
 import React from "react";
 import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 
 interface AdminPanelProps {
-  onAddHoliday: (date: string) => void;
-  onAddConcentration: (date: string, note?: string) => void;
   isDarkMode?: boolean;
 }
 
-const AdminPanel: React.FC<AdminPanelProps> = ({
-  onAddHoliday,
-  onAddConcentration,
-  isDarkMode = false,
-}) => {
-  const [holidayDate, setHolidayDate] = React.useState("");
-  const [concentrationDate, setConcentrationDate] = React.useState("");
-  const [concentrationNote, setConcentrationNote] = React.useState("");
-
+const AdminPanel: React.FC<AdminPanelProps> = ({ isDarkMode = false }) => {
   return (
     <Paper
       sx={{
@@ -39,56 +26,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       >
         Panel de administración
       </Typography>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>
-          Agregar festivo nacional
-        </Typography>
-        <TextField
-          type="date"
-          value={holidayDate}
-          onChange={(e) => setHolidayDate(e.target.value)}
-          sx={{ mr: 2 }}
-          size="small"
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => onAddHoliday(holidayDate)}
-          disabled={!holidayDate}
-        >
-          Agregar
-        </Button>
-      </Box>
-      <Box>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>
-          Agregar día de concentración en oficina
-        </Typography>
-        <TextField
-          type="date"
-          value={concentrationDate}
-          onChange={(e) => setConcentrationDate(e.target.value)}
-          sx={{ mr: 2 }}
-          size="small"
-        />
-        <TextField
-          type="text"
-          placeholder="Nota (opcional)"
-          value={concentrationNote}
-          onChange={(e) => setConcentrationNote(e.target.value)}
-          sx={{ mr: 2 }}
-          size="small"
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() =>
-            onAddConcentration(concentrationDate, concentrationNote)
-          }
-          disabled={!concentrationDate}
-        >
-          Agregar
-        </Button>
-      </Box>
     </Paper>
   );
 };
