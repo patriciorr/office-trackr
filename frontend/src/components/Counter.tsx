@@ -36,17 +36,18 @@ const Counter: React.FC<CounterProps> = ({
     }
     return days;
   }
+  const laborDays = getLaborDays(year, month);
 
   const officeDaysArr = events.filter(
-    (e: CalendarEvent) => e.type === "office"
+    (e: CalendarEvent) =>
+      e.type === "office" && laborDays.includes(e.date.slice(0, 10))
   );
   const vacationDaysArr = events.filter(
-    (e: CalendarEvent) => e.type === "vacation"
+    (e: CalendarEvent) =>
+      e.type === "vacation" && laborDays.includes(e.date.slice(0, 10))
   );
   const officeDays = officeDaysArr.length;
   const vacationDays = vacationDaysArr.length;
-
-  const laborDays = getLaborDays(year, month);
 
   const vacationDates = vacationDaysArr.map((e) => e.date.slice(0, 10));
   const officeDates = officeDaysArr.map((e) => e.date.slice(0, 10));
