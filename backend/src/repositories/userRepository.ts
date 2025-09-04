@@ -23,10 +23,10 @@ export default class UserRepository {
     return this.toUserDTO(savedUser);
   }
 
-  async findById(id: string) {
+  async findById(id: string, isInternal: boolean): Promise<IUser | UserDTO | null> {
     logger.info(`UserRepository: findById called for id: ${id}`);
     const user = await User.findOne({id});
-    return user ? this.toUserDTO(user) : null;
+    return user ? (isInternal ? user : this.toUserDTO(user)) : null;
   }
 
   async findAll() {

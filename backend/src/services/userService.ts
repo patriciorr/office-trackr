@@ -37,7 +37,7 @@ export default class UserService {
 
   async getUserById(id: string) {
     logger.info(`UserService: getUserById called for id: ${id}`);
-    return this.userRepository.findById(id);
+    return this.userRepository.findById(id, false);
   }
 
   async getAllUsers() {
@@ -45,14 +45,40 @@ export default class UserService {
     return this.userRepository.findAll();
   }
 
-  async updateUser(id: string, update: Partial<IUser>) {
+  async updateUser(
+    id: string,
+    update: Partial<IUser>,
+    oldPassword?: string,
+    newPassword?: string,
+    confirmPassword?: string
+  ) {
     logger.info(`UserService: updateUser called for id: ${id}`);
+
+    if (oldPassword || newPassword || confirmPassword) {
+      if (!oldPassword || !newPassword || !confirmPassword) {
+        throw new ValidationError('PW004 - All password fields are required');
+      }
+      if (newPassword !== confirmPassword) {
+        throw new ValidationError('PW005 - New passwords do not match');
+      }
+
+      const user = await this.userRepository.findById(id, true) as IUser;
+      if (!user) throw new ValidationError('PW006 - User not found');
+
+      const valid = await bcrypt.compare(oldPassword, user.password);
+      if (!valid) throw new ValidationError('PW007 - Old password incorrect');
+
+      await this.validatePassword(newPassword);
+
+      update.password = await bcrypt.hash(newPassword, 12);
+    }
+
     if (update.email) {
       await this.validateEmail(update.email);
     }
-    if (update.password) {
-      await this.validatePassword(update.password);
-      update.password = await bcrypt.hash(update.password, 12);
+    if (update.password && !(oldPassword || newPassword || confirmPassword)) {
+      // Only allow password update via secure flow
+      throw new ValidationError('PW008 - Direct password update not allowed');
     }
     if (update.firstName) {
       await this.validateFirstName(update.firstName);
@@ -60,7 +86,7 @@ export default class UserService {
     if (update.lastName) {
       await this.validateLastName(update.lastName);
     }
-    return this.userRepository.updateById(id, update);
+  return this.userRepository.updateById(id, update);
   }
 
   async deleteUser(id: string) {
@@ -115,7 +141,7 @@ export default class UserService {
       );
     }
 
-    if (commonPasswords.includes(password.toLowerCase())) {
+    if (commonPasswords.some((pw) => password.toLowerCase().includes(pw))) {
       logger.warn(`UserService: common password used`);
       throw new ValidationError('PW003 - Password is too common. Choose a more secure password');
     }

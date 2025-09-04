@@ -63,7 +63,15 @@ export default class UserController {
         return res.status(403).json({error: 'Forbidden'});
       }
 
-      const user = await userService.updateUser(userId, req.body);
+      const { oldPassword, newPassword, confirmPassword, ...rest } = req.body;
+      const user = await userService.updateUser(
+        userId,
+        rest,
+        oldPassword,
+        newPassword,
+        confirmPassword
+      );
+
       if (!user) {
         logger.warn(`User not found: ${userId}`);
         return res.status(404).json({error: 'User not found'});

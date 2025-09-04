@@ -57,6 +57,7 @@ const Navbar: React.FC<NavbarProps> = ({
   };
 
   const handleLogoutClick = () => {
+    navigate("/");
     if (onLogout) onLogout();
     setAnchorEl(null);
   };
@@ -90,7 +91,7 @@ const Navbar: React.FC<NavbarProps> = ({
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <img
-            src="/agenda.png"
+            src="src/assets/agenda.png"
             alt="Logo"
             style={{ height: 32, cursor: "pointer" }}
             onClick={handleLogoClick}
