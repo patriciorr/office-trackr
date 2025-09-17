@@ -10,10 +10,50 @@ db.createUser({
 if (!db.users.findOne({ email: "admin@admin.com" })) {
   db.users.insertOne({
     id: crypto.randomUUID(),
-    name: "admin",
-    email: "admin@admin.com",
-    password: "$2b$12$uoxz.9Xc9pGhHSo6dvgbtOs5KtYtJY07vYhUp7Mv0y8gO6aTzWzda",
+    firstName: "Admin",
+    lastName: "Admin",
+    email: "admin@test.com",
+    password: "$2b$12$uRY9qrL7SDlMCwXM6HrH8./dS2.JvoX0b72PSF8kRutsrFqbj2oJ.",
     role: "admin",
+    team: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+}
+if (!db.users.findOne({ email: "manager@test.com" })) {
+  db.users.insertOne({
+    id: crypto.randomUUID(),
+    firstName: "Manager",
+    lastName: "Manager",
+    email: "manager@test.com",
+    password: "$2b$12$uRY9qrL7SDlMCwXM6HrH8./dS2.JvoX0b72PSF8kRutsrFqbj2oJ.",
+    role: "manager",
+    team: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+}
+if (!db.users.findOne({ email: "johndoe@test.com" })) {
+  db.users.insertOne({
+    id: crypto.randomUUID(),
+    firstName: "John",
+    lastName: "Doe",
+    email: "johndoe@test.com",
+    password: "$2b$12$uRY9qrL7SDlMCwXM6HrH8./dS2.JvoX0b72PSF8kRutsrFqbj2oJ.",
+    role: "coworker",
+    team: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+}
+if (!db.users.findOne({ email: "janedoe@test.com" })) {
+  db.users.insertOne({
+    id: crypto.randomUUID(),
+    firstName: "Jane",
+    lastName: "Doe",
+    email: "janedoe@test.com",
+    password: "$2b$12$uRY9qrL7SDlMCwXM6HrH8./dS2.JvoX0b72PSF8kRutsrFqbj2oJ.",
+    role: "coworker",
     team: null,
     createdAt: new Date(),
     updatedAt: new Date(),

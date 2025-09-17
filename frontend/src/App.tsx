@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Box from "@mui/material/Box";
 import Counter from "./components/Counter";
 import Login from "./components/Login";
@@ -33,7 +38,7 @@ interface WorkerSummary {
 }
 
 const App: React.FC = () => {
-  const { user, setUser, updateUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const role = user?.role || "coworker";
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState<"es" | "en">(() => {
@@ -68,7 +73,6 @@ const App: React.FC = () => {
   const today = new Date();
   const [calendarMonth, setCalendarMonth] = useState<number>(today.getMonth()); // 0-indexed
   const [calendarYear, setCalendarYear] = useState<number>(today.getFullYear());
-  const [workerSummaries, setWorkerSummaries] = useState<WorkerSummary[]>([]);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -103,35 +107,6 @@ const App: React.FC = () => {
         .catch(() => setMonthEvents([]));
     }
   }, [token, user, calendarYear, calendarMonth]);
-
-  useEffect(() => {
-    if (activeTab === t("dashboard") && role === "manager") {
-      // TODO: Replace with real logic
-      setWorkerSummaries([
-        {
-          userId: "1",
-          name: "Ana López",
-          officeDays: 12,
-          vacationDays: 2,
-          wfaDays: 6,
-        },
-        {
-          userId: "2",
-          name: "Juan Pérez",
-          officeDays: 10,
-          vacationDays: 4,
-          wfaDays: 6,
-        },
-        {
-          userId: "3",
-          name: "Sara Ruiz",
-          officeDays: 15,
-          vacationDays: 0,
-          wfaDays: 5,
-        },
-      ]);
-    }
-  }, [activeTab, role]);
 
   const handleLogin = (token: string, userObj: any) => {
     setToken(token);
@@ -434,20 +409,31 @@ const App: React.FC = () => {
                       </Box>
                     </Box>
                   )}
-                  {activeTab === "dashboard" && role === "manager" && (
-                    <ManagerDashboard
-                      summaries={workerSummaries}
-                      isDarkMode={isDarkMode}
-                    />
-                  )}
-                  {activeTab === "admin" && role === "admin" && (
-                    <AdminPanel isDarkMode={isDarkMode} />
-                  )}
                 </Container>
               </LocalizationProvider>
             }
           />
           <Route path="/edit-user" element={<UserEdit />} />
+          <Route
+            path="/dashboard"
+            element={
+              role === "manager" ? (
+                <ManagerDashboard isDarkMode={isDarkMode} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              role === "admin" ? (
+                <AdminPanel isDarkMode={isDarkMode} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
         </Routes>
         {modalOpen && modalDate && (
           <DayEventModal

@@ -14,34 +14,36 @@ export default class EventService {
     const existing: IEvent | null = await this.eventRepository.findByUserAndDate(userId, date);
     if (existing) {
       logger.info(`EventService: updating existing event for user: ${userId}, date: ${date}`);
-      return this.eventRepository.updateById(existing.id, {
+      return this.eventRepository.updateEventById(existing.id, {
         type,
       });
     }
 
     eventData.id = randomUUID();
     logger.info(`EventService: creating new event for user: ${userId}, date: ${date}, id: ${eventData.id}`);
-    return this.eventRepository.create(eventData);
+    return this.eventRepository.createEvent(eventData);
   }
 
-  async getEventsByUser(userId: string) {
-    logger.info(`EventService: getEventsByUser called for userId: ${userId}`);
-    return this.eventRepository.findByUser(userId);
-  }
+  // TODO: Enable if needed
+  // async getEventsByUser(userId: string) {
+  //   logger.info(`EventService: getEventsByUser called for userId: ${userId}`);
+  //   return this.eventRepository.findByUser(userId);
+  // }
 
-  async getAllEvents() {
-    logger.info('EventService: getAllEvents called');
-    return this.eventRepository.findAll();
-  }
+  // TODO: Enable if needed
+  // async getAllEvents() {
+  //   logger.info('EventService: getAllEvents called');
+  //   return this.eventRepository.findAll();
+  // }
 
   async updateEvent(id: string, update: Partial<IEvent>) {
     logger.info(`EventService: updateEvent called for id: ${id}`);
-    return this.eventRepository.updateById(id, update);
+    return this.eventRepository.updateEventById(id, update);
   }
 
   async deleteEvent(id: string) {
     logger.info(`EventService: deleteEvent called for id: ${id}`);
-    return this.eventRepository.deleteById(id);
+    return this.eventRepository.deleteEventById(id);
   }
 
   async listEvents(filters: {year?: number; month?: number; type?: string; userId?: string}) {
@@ -58,6 +60,6 @@ export default class EventService {
       const end = new Date(filters.year, 11, 31, 23, 59, 59, 999);
       query.date = {$gte: start, $lte: end};
     }
-    return this.eventRepository.findFiltered(query);
+    return this.eventRepository.listEvents(query);
   }
 }

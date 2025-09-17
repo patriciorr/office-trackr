@@ -60,10 +60,16 @@ const Register: React.FC<RegisterProps> = ({
     setSuccess("");
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/users/register", {
+      const res = await fetch("http://localhost:5000/api/users/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, email, password, role }),
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+          role,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t("register_failed"));

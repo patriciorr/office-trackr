@@ -104,6 +104,8 @@ const Calendar: React.FC<CalendarProps> = ({
           if (date) onSelectDay(date as Date);
         }}
         onMonthChange={handleMonthChange}
+        minDate={new Date(currentYear - 2, currentMonth, 1)}
+        maxDate={new Date(currentYear + 2, currentMonth, 1)}
         slots={{
           day: (props: any) => <CustomDay {...props} events={events} />,
         }}

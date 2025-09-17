@@ -3,6 +3,7 @@ import UserService from '../services/userService';
 import {ValidationError, AppError} from '../utils/AppError';
 import {logger} from '../config/logger';
 import {AuthRequest} from '../middleware/authMiddleware';
+import {ListUsersFilter, toListUsersFilter} from '../utils/listUserFilter';
 
 const userService = new UserService();
 
@@ -23,10 +24,17 @@ export default class UserController {
     }
   }
 
-  static async getAll(req: Request, res: Response) {
+  static async listUsers(req: Request, res: Response) {
     try {
       logger.info('Get all users request');
-      const users = await userService.getAllUsers();
+
+      let filter: ListUsersFilter = {};
+      if (req.query) {
+        filter = toListUsersFilter(req.query);
+      }
+      logger.info(`Applying filter: ${JSON.stringify(filter)}`);
+
+      const users = await userService.listUsers(filter);
       logger.info(`Fetched ${users.length} users`);
       res.json(users);
     } catch (err: any) {
@@ -35,7 +43,7 @@ export default class UserController {
     }
   }
 
-  static async getById(req: Request, res: Response) {
+  static async getUserById(req: Request, res: Response) {
     try {
       const userId = req.params.id;
       logger.info(`Get user by ID request: ${userId}`);
@@ -63,14 +71,8 @@ export default class UserController {
         return res.status(403).json({error: 'Forbidden'});
       }
 
-      const { oldPassword, newPassword, confirmPassword, ...rest } = req.body;
-      const user = await userService.updateUser(
-        userId,
-        rest,
-        oldPassword,
-        newPassword,
-        confirmPassword
-      );
+      const {oldPassword, newPassword, confirmPassword, ...rest} = req.body;
+      const user = await userService.updateUser(userId, rest, oldPassword, newPassword, confirmPassword);
 
       if (!user) {
         logger.warn(`User not found: ${userId}`);

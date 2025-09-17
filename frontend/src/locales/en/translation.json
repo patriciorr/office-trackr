@@ -79,5 +79,9 @@
   "name_update_success": "Name updated successfully",
   "name_update_failed": "Failed to update name",
   "password_update_success": "Password updated successfully",
-  "password_update_failed": "Failed to update password"
+  "password_update_failed": "Failed to update password",
+  "add_coworker": "Add coworker",
+  "add_coworker_title": "Add coworkers to the team",
+  "coworkers": "Coworkers",
+  "confirm": "Confirm"
 }

@@ -5,6 +5,7 @@ import {logger} from '../config/logger';
 import {ValidationError} from '../utils/AppError';
 import {commonPasswords} from '../utils/commonPasswords';
 import {randomUUID} from 'crypto';
+import {ListUsersFilter} from '../utils/listUserFilter';
 
 export default class UserService {
   private userRepository = new UserRepository();
@@ -20,6 +21,10 @@ export default class UserService {
     await this.validateLastName(userData.lastName);
     await this.validateEmail(userData.email);
     await this.validatePassword(userData.password);
+
+    if (userData.team) {
+      throw new ValidationError('TEAM001 - Team cannot be set during user creation');
+    }
 
     userData.password = await bcrypt.hash(userData.password, 12);
     logger.info(`UserService: password hashed for email: ${userData.email}`);
@@ -40,9 +45,9 @@ export default class UserService {
     return this.userRepository.findById(id, false);
   }
 
-  async getAllUsers() {
-    logger.info('UserService: getAllUsers called');
-    return this.userRepository.findAll();
+  async listUsers(filter?: ListUsersFilter) {
+    logger.info(`UserService: listUsers called with filter: ${JSON.stringify(filter)}`);
+    return this.userRepository.listUsers(filter);
   }
 
   async updateUser(
@@ -62,7 +67,7 @@ export default class UserService {
         throw new ValidationError('PW005 - New passwords do not match');
       }
 
-      const user = await this.userRepository.findById(id, true) as IUser;
+      const user = (await this.userRepository.findById(id, true)) as IUser;
       if (!user) throw new ValidationError('PW006 - User not found');
 
       const valid = await bcrypt.compare(oldPassword, user.password);
@@ -86,7 +91,11 @@ export default class UserService {
     if (update.lastName) {
       await this.validateLastName(update.lastName);
     }
-  return this.userRepository.updateById(id, update);
+    if (update.team) {
+      await this.validateTeam(update.team);
+    }
+
+    return this.userRepository.updateById(id, update);
   }
 
   async deleteUser(id: string) {
@@ -141,9 +150,23 @@ export default class UserService {
       );
     }
 
-    if (commonPasswords.some((pw) => password.toLowerCase().includes(pw))) {
+    if (commonPasswords.some(pw => password.toLowerCase().includes(pw))) {
       logger.warn(`UserService: common password used`);
       throw new ValidationError('PW003 - Password is too common. Choose a more secure password');
+    }
+  }
+
+  private async validateTeam(team: string[]) {
+    if (!Array.isArray(team)) {
+      logger.warn(`UserService: team is not an array`);
+      throw new ValidationError('TEAM002 - Team must be an array of user IDs');
+    }
+    for (const memberId of team) {
+      const member = await this.userRepository.findById(memberId, false);
+      if (!member) {
+        logger.warn(`UserService: team member not found: ${memberId}`);
+        throw new ValidationError(`TEAM003 - Team member not found: ${memberId}`);
+      }
     }
   }
 }

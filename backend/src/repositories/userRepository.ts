@@ -1,5 +1,6 @@
 import User, {IUser} from '../models/User';
 import {logger} from '../config/logger';
+import {ListUsersFilter} from '../utils/listUserFilter';
 
 export interface UserDTO {
   id: string;
@@ -7,6 +8,7 @@ export interface UserDTO {
   firstName: string;
   lastName: string;
   role: string;
+  team?: string[];
 }
 
 export default class UserRepository {
@@ -29,9 +31,21 @@ export default class UserRepository {
     return user ? (isInternal ? user : this.toUserDTO(user)) : null;
   }
 
-  async findAll() {
-    logger.info('UserRepository: findAll called');
-    const users = await User.find();
+  async listUsers(filter?: ListUsersFilter) {
+    logger.info('UserRepository: listUsers called');
+    let repoFilter = {};
+    if (filter) {
+      if (filter.roles) {
+        repoFilter = {...repoFilter, role: {$in: filter.roles}};
+      }
+      if (filter.emails) {
+        repoFilter = {...repoFilter, email: {$in: filter.emails}};
+      }
+      if (filter.ids) {
+        repoFilter = {...repoFilter, id: {$in: filter.ids}};
+      }
+    }
+    const users = await User.find(repoFilter);
     return users.map(this.toUserDTO);
   }
 
@@ -55,6 +69,7 @@ export default class UserRepository {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
+      team: user.team,
     };
   }
 }

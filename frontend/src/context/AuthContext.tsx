@@ -1,10 +1,11 @@
-import React, { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 interface User {
   id: string;
   firstName: string;
   lastName: string;
   role: "admin" | "manager" | "coworker";
+  team?: string[];
 }
 
 interface AuthContextType {
@@ -24,11 +25,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
+
   const updateUser = (updates: Partial<User>) => {
     setUser((prev) => (prev ? { ...prev, ...updates } : prev));
-    if (user) {
-      localStorage.setItem("user", JSON.stringify({ ...user, ...updates }));
-    }
   };
 
   return (

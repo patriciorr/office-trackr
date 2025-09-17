@@ -1,31 +1,141 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-
-interface WorkerSummary {
-  userId: string;
-  name: string;
-  officeDays: number;
-  vacationDays: number;
-  wfaDays: number;
-}
+import { AuthContext } from "../context/AuthContext";
+import {
+  Autocomplete,
+  Button,
+  IconButton,
+  Modal,
+  TextField,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from "react-i18next";
+import { te } from "date-fns/locale";
 
 interface ManagerDashboardProps {
-  summaries: WorkerSummary[];
   isDarkMode?: boolean;
 }
 
 const colorMap: Record<string, string> = {
-  office: "#1976d2",
-  vacation: "#90caf9",
-  wfa: "#6a89cc",
+  office: "#e53935",
+  vacation: "#43a047",
+  telework: "#1976d2",
+};
+
+const style = {
+  position: "absolute" as const,
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 4,
 };
 
 const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
-  summaries,
   isDarkMode = false,
 }) => {
+  const { t } = useTranslation();
+  const { user, setUser } = useContext(AuthContext);
+  const [coworkers, setCoworkers] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedCoworkers, setSelectedCoworkers] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [availableCoworkers, setAvailableCoworkers] = useState<any[]>([]);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user!.role === "manager" && user?.team && user.team.length > 0) {
+      fetch(`http://localhost:5000/api/users?ids=${user.team.join(",")}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => setCoworkers(data))
+        .catch(() => setCoworkers([]));
+    } else {
+      setCoworkers([]);
+      setEvents([]);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (coworkers.length > 0) {
+      for (const coworker of coworkers) {
+        fetch(`http://localhost:5000/api/events?userId=${coworker.id}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            const officeDays = data.filter(
+              (event: any) => event.type === "office"
+            ).length;
+            const vacationDays = data.filter(
+              (event: any) => event.type === "vacation"
+            ).length;
+
+            setEvents((prev) => [
+              ...prev,
+              {
+                userId: coworker.id,
+                officeDays,
+                vacationDays,
+              },
+            ]);
+          })
+          .catch(() => {});
+      }
+    } else {
+      setEvents([]);
+    }
+  }, [coworkers]);
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/users?roles=coworker`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => data.filter((c: any) => !user?.team?.includes(c.id)))
+      .then((filtered) => setAvailableCoworkers(filtered))
+      .catch(() => setAvailableCoworkers([]));
+  }, [user]);
+
+  const handleRemoveCoworker = async (id: string) => {
+    setLoadingId(id);
+    try {
+      const newTeam = user!.team!.filter((uid) => uid !== id);
+      const res = await fetch(`http://localhost:5000/api/users/${user!.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ team: newTeam }),
+      });
+      if (!res.ok) throw new Error("Error actualizando equipo");
+      const updated = await res.json();
+      setUser(updated);
+    } catch (e: any) {
+      setError(e.message || "Error desconocido");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -40,46 +150,143 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
         boxShadow: 3,
       }}
     >
-      {summaries.map((worker) => (
-        <Paper
-          key={worker.userId}
-          elevation={3}
-          sx={{
-            background: "#fff",
-            borderRadius: 3,
-            minWidth: 260,
-            p: 3,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
+      {coworkers.map((worker) => (
+        <Box
+          key={worker.id}
+          sx={{ position: "relative", display: "inline-block" }}
         >
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, color: "#1976d2", mb: 1 }}
+          <Paper
+            elevation={3}
+            sx={{
+              background: isDarkMode ? "#232946" : "#fff",
+              borderRadius: 3,
+              minWidth: 260,
+              p: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              position: "relative",
+            }}
           >
-            {worker.name}
-          </Typography>
-          <Box sx={{ width: "100%", mb: 1 }}>
-            <Typography
-              sx={{ color: colorMap.office, fontWeight: 600 }}
-              component="span"
+            <IconButton
+              size="small"
+              sx={{ position: "absolute", top: 8, right: 8, zIndex: 2 }}
+              onClick={() => handleRemoveCoworker(worker.id)}
             >
-              Oficina:
-            </Typography>
-            <Typography component="span"> {worker.officeDays}</Typography>
-          </Box>
-          <Box sx={{ width: "100%", mb: 1 }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
             <Typography
-              sx={{ color: colorMap.vacation, fontWeight: 600 }}
-              component="span"
+              variant="h6"
+              sx={{ fontWeight: 700, color: isDarkMode ? "#eaf0fa" : "#1b1b1b", mb: 1 }}
             >
-              Vacaciones:
+              {worker.firstName} {worker.lastName}
             </Typography>
-            <Typography component="span"> {worker.vacationDays}</Typography>
-          </Box>
-        </Paper>
+            <Box sx={{ width: "100%", mb: 1 }}>
+              <Typography
+                sx={{ color: colorMap.office, fontWeight: 600 }}
+                component="span"
+              >
+                {t("office_days")}:{" "}
+                {events.find((event) => event.userId === worker.id)?.officeDays}
+              </Typography>
+            </Box>
+            <Box sx={{ width: "100%", mb: 1 }}>
+              <Typography
+                sx={{ color: colorMap.vacation, fontWeight: 600 }}
+                component="span"
+              >
+                {t("vacation_days")}:{" "}
+                {
+                  events.find((event) => event.userId === worker.id)
+                    ?.vacationDays
+                }
+              </Typography>
+            </Box>
+            <Box sx={{ width: "100%", mb: 1 }}>
+              <Typography
+                sx={{ color: colorMap.telework, fontWeight: 600 }}
+                component="span"
+              >
+                {t("telework_days")}:{" "}
+                {
+                  events.find((event) => event.userId === worker.id)
+                    ?.teleworkDays
+                }
+              </Typography>
+            </Box>
+          </Paper>
+        </Box>
       ))}
+
+      {availableCoworkers.length > 0 && (
+        <Button variant="contained" onClick={() => setModalOpen(true)}>
+          {t("add_coworker")}
+        </Button>
+      )}
+
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box sx={style}>
+          <Typography variant="h6" mb={2}>
+            {t("add_coworker_title")}
+          </Typography>
+          <Autocomplete
+            multiple
+            options={availableCoworkers}
+            getOptionLabel={(option) =>
+              `${option.firstName} ${option.lastName}`
+            }
+            onChange={(_, value) =>
+              setSelectedCoworkers(value.map((c) => c.id))
+            }
+            renderInput={(params) => (
+              <TextField {...params} label={t("coworkers")} />
+            )}
+          />
+          <Box mt={2} display="flex" gap={2}>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                  const newTeam = [...user?.team!, ...selectedCoworkers];
+                  const res = await fetch(
+                    `http://localhost:5000/api/users/${user!.id}`,
+                    {
+                      method: "PATCH",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem(
+                          "token"
+                        )}`,
+                      },
+                      body: JSON.stringify({ team: newTeam }),
+                    }
+                  );
+                  if (!res.ok) throw new Error("Error actualizando equipo");
+                  const updated = await res.json();
+                  setUser(updated);
+                  setModalOpen(false);
+                  setSelectedCoworkers([]);
+                } catch (e: any) {
+                  setError(e.message || "Error desconocido");
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading || selectedCoworkers.length === 0}
+            >
+              {t("confirm")}
+            </Button>
+            <Button onClick={() => setModalOpen(false)}>{t("cancel")}</Button>
+          </Box>
+          {error && (
+            <Typography color="error" mt={2}>
+              {error}
+            </Typography>
+          )}
+        </Box>
+      </Modal>
     </Box>
   );
 };

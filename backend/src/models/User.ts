@@ -7,7 +7,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: 'admin' | 'manager' | 'coworker';
-  team?: string;
+  team?: string[];
 }
 
 const userSchema = new Schema<IUser>(
@@ -22,7 +22,7 @@ const userSchema = new Schema<IUser>(
       enum: ['admin', 'manager', 'coworker'],
       default: 'coworker',
     },
-    team: {type: String},
+    team: {type: [String], default: []},
   },
   {timestamps: true}
 );

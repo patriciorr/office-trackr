@@ -79,5 +79,9 @@
   "name_update_success": "Nombre actualizado correctamente",
   "name_update_failed": "Error al actualizar el nombre",
   "password_update_success": "Contraseña actualizada correctamente",
-  "password_update_failed": "Error al actualizar la contraseña"
+  "password_update_failed": "Error al actualizar la contraseña",
+  "add_coworker": "Añadir trabajador",
+  "add_coworker_title": "Añadir trabajadores al equipo",
+  "coworkers": "Trabajadores",
+  "confirm": "Confirmar"
 }

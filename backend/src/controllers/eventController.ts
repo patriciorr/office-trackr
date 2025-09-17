@@ -2,7 +2,7 @@ import {Request, Response} from 'express';
 import {AuthRequest} from '../middleware/authMiddleware';
 import {logger} from '../config/logger';
 import EventService from '../services/eventService';
-import {emitEventUpdate} from '../sockets'; // Actualiza si tienes eventos en tiempo real
+import {emitEventUpdate} from '../sockets';
 
 const eventService = new EventService();
 
@@ -23,16 +23,17 @@ export default class EventController {
     }
   }
 
-  static async getEventByUser(req: Request, res: Response) {
-    try {
-      logger.info(`Get events for user: ${req.params.userId}`);
-      const events = await eventService.getEventsByUser(req.params.userId);
-      res.json(events);
-    } catch (err) {
-      logger.error(`Error fetching events for user ${req.params.userId}: ${err}`);
-      res.status(500).json({error: 'Error fetching events', details: err});
-    }
-  }
+  // TODO: Enable if needed
+  // static async getEventByUser(req: Request, res: Response) {
+  //   try {
+  //     logger.info(`Get events for user: ${req.params.userId}`);
+  //     const events = await eventService.getEventsByUser(req.params.userId);
+  //     res.json(events);
+  //   } catch (err) {
+  //     logger.error(`Error fetching events for user ${req.params.userId}: ${err}`);
+  //     res.status(500).json({error: 'Error fetching events', details: err});
+  //   }
+  // }
 
   static async listEvents(req: Request, res: Response) {
     try {
