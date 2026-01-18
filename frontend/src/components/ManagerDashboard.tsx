@@ -10,9 +10,12 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { es, enUS } from "date-fns/locale";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
-import { te } from "date-fns/locale";
+import i18n from "i18next";
 
 interface ManagerDashboardProps {
   isDarkMode?: boolean;
@@ -49,6 +52,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [availableCoworkers, setAvailableCoworkers] = useState<any[]>([]);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   useEffect(() => {
     if (user!.role === "manager" && user?.team && user.team.length > 0) {
@@ -68,23 +72,28 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   }, [user]);
 
   useEffect(() => {
-    if (coworkers.length > 0) {
-      for (const coworker of coworkers) {
-        fetch(`http://localhost:5000/api/events?userId=${coworker.id}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+    if (coworkers.length > 0 && selectedDate) {
+      setEvents([]); // Clean previous events
+      const year = selectedDate.getFullYear();
+      const month = selectedDate.getMonth() + 1; // JS: 0-indexed, API: 1-indexed
+      coworkers.forEach((coworker) => {
+        fetch(
+          `http://localhost:5000/api/events?userId=${coworker.id}&year=${year}&month=${month}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           },
-        })
+        )
           .then((res) => res.json())
           .then((data) => {
             const officeDays = data.filter(
-              (event: any) => event.type === "office"
+              (event: any) => event.type === "office",
             ).length;
             const vacationDays = data.filter(
-              (event: any) => event.type === "vacation"
+              (event: any) => event.type === "vacation",
             ).length;
-
             setEvents((prev) => [
               ...prev,
               {
@@ -95,11 +104,11 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
             ]);
           })
           .catch(() => {});
-      }
+      });
     } else {
       setEvents([]);
     }
-  }, [coworkers]);
+  }, [coworkers, selectedDate]);
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/users?roles=coworker`, {
@@ -140,7 +149,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
     <Box
       sx={{
         display: "flex",
-        flexWrap: "wrap",
+        flexDirection: "column",
         gap: 4,
         p: 4,
         justifyContent: "center",
@@ -150,80 +159,99 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
         boxShadow: 3,
       }}
     >
-      {coworkers.map((worker) => (
-        <Box
-          key={worker.id}
-          sx={{ position: "relative", display: "inline-block" }}
+      <Box sx={{ mb: 3, display: "flex", justifyContent: "center" }}>
+        <LocalizationProvider
+          key={i18n.language}
+          dateAdapter={AdapterDateFns}
+          adapterLocale={i18n.language === "es" ? es : enUS}
         >
-          <Paper
-            elevation={3}
-            sx={{
-              background: isDarkMode ? "#232946" : "#fff",
-              borderRadius: 3,
-              minWidth: 260,
-              p: 3,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              position: "relative",
-            }}
+          <DatePicker
+            views={["month", "year"]}
+            label={t("select_month")}
+            minDate={new Date(2022, 0, 1)}
+            maxDate={new Date(2100, 11, 31)}
+            value={selectedDate}
+            onChange={(newValue) => setSelectedDate(newValue)}
+            slotProps={{ textField: { fullWidth: true } }}
+          />
+        </LocalizationProvider>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 4,
+          justifyContent: "center",
+        }}
+      >
+        {coworkers.map((worker) => (
+          <Box
+            key={worker.id}
+            sx={{ position: "relative", display: "inline-block" }}
           >
-            <IconButton
-              size="small"
-              sx={{ position: "absolute", top: 8, right: 8, zIndex: 2 }}
-              onClick={() => handleRemoveCoworker(worker.id)}
+            <Paper
+              elevation={3}
+              sx={{
+                background: isDarkMode ? "#232946" : "#fff",
+                borderRadius: 3,
+                minWidth: 260,
+                p: 3,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                position: "relative",
+              }}
             >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, color: isDarkMode ? "#eaf0fa" : "#1b1b1b", mb: 1 }}
-            >
-              {worker.firstName} {worker.lastName}
-            </Typography>
-            <Box sx={{ width: "100%", mb: 1 }}>
-              <Typography
-                sx={{ color: colorMap.office, fontWeight: 600 }}
-                component="span"
+              <IconButton
+                size="small"
+                sx={{ position: "absolute", top: 8, right: 8, zIndex: 2 }}
+                onClick={() => handleRemoveCoworker(worker.id)}
               >
-                {t("office_days")}:{" "}
-                {events.find((event) => event.userId === worker.id)?.officeDays}
-              </Typography>
-            </Box>
-            <Box sx={{ width: "100%", mb: 1 }}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
               <Typography
-                sx={{ color: colorMap.vacation, fontWeight: 600 }}
-                component="span"
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  color: isDarkMode ? "#eaf0fa" : "#1b1b1b",
+                  mb: 1,
+                }}
               >
-                {t("vacation_days")}:{" "}
-                {
-                  events.find((event) => event.userId === worker.id)
-                    ?.vacationDays
-                }
+                {worker.firstName} {worker.lastName}
               </Typography>
-            </Box>
-            <Box sx={{ width: "100%", mb: 1 }}>
-              <Typography
-                sx={{ color: colorMap.telework, fontWeight: 600 }}
-                component="span"
-              >
-                {t("telework_days")}:{" "}
-                {
-                  events.find((event) => event.userId === worker.id)
-                    ?.teleworkDays
-                }
-              </Typography>
-            </Box>
-          </Paper>
-        </Box>
-      ))}
-
-      {availableCoworkers.length > 0 && (
-        <Button variant="contained" onClick={() => setModalOpen(true)}>
-          {t("add_coworker")}
-        </Button>
-      )}
-
+              <Box sx={{ width: "100%", mb: 1 }}>
+                <Typography
+                  sx={{ color: colorMap.office, fontWeight: 600 }}
+                  component="span"
+                >
+                  {t("office_days")}:{" "}
+                  {
+                    events.find((event) => event.userId === worker.id)
+                      ?.officeDays
+                  }
+                </Typography>
+              </Box>
+              <Box sx={{ width: "100%", mb: 1 }}>
+                <Typography
+                  sx={{ color: colorMap.vacation, fontWeight: 600 }}
+                  component="span"
+                >
+                  {t("vacation_days")}:{" "}
+                  {
+                    events.find((event) => event.userId === worker.id)
+                      ?.vacationDays
+                  }
+                </Typography>
+              </Box>
+            </Paper>
+          </Box>
+        ))}
+        {availableCoworkers.length > 0 && (
+          <Button variant="contained" onClick={() => setModalOpen(true)}>
+            {t("add_coworker")}
+          </Button>
+        )}
+      </Box>
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box sx={style}>
           <Typography variant="h6" mb={2}>
@@ -257,11 +285,11 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                       headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem(
-                          "token"
+                          "token",
                         )}`,
                       },
                       body: JSON.stringify({ team: newTeam }),
-                    }
+                    },
                   );
                   if (!res.ok) throw new Error("Error actualizando equipo");
                   const updated = await res.json();

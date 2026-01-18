@@ -83,5 +83,6 @@
   "add_coworker": "Añadir trabajador",
   "add_coworker_title": "Añadir trabajadores al equipo",
   "coworkers": "Trabajadores",
-  "confirm": "Confirmar"
+  "confirm": "Confirmar",
+  "select_month": "Seleccionar mes"
 }
