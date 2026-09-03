@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import UserTable from "./UserTable";
 import UserEditModal from "./UserEditModal";
@@ -7,6 +8,7 @@ import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import TeamEditModal from "./TeamEditModal";
 import type { User } from "./UserTable";
 import { useTranslation } from "react-i18next";
+import { surfaceColors } from "../themeColors";
 
 interface AdminPanelProps {
   isDarkMode?: boolean;
@@ -23,26 +25,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ isDarkMode = false }) => {
     <>
       <Paper
         sx={{
-          maxWidth: 400,
+          width: "calc(100% - 32px)",
+          maxWidth: 1200,
           mx: "auto",
-          mt: 4,
-          p: 3,
+          mt: { xs: 2, md: 4 },
+          p: { xs: 2.5, md: 4 },
           borderRadius: 3,
           boxShadow: 3,
-          background: isDarkMode ? "#232946" : "#fff",
-          color: isDarkMode ? "#eaf0fa" : "#232946",
+          background: isDarkMode ? surfaceColors.dark.paper : surfaceColors.light.paper,
+          color: isDarkMode ? "#edf7f8" : "#183247",
         }}
       >
-        <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800 }}>
           {t("admin_panel")}
         </Typography>
       </Paper>
-      <UserTable
-        onEdit={(user) => setEditUser(user)}
-        onDelete={(user) => setDeleteUser(user)}
-        onEditTeam={(user) => setEditTeamUser(user)}
-        refresh={refreshTable}
-      />
+      <Box sx={{ width: "calc(100% - 32px)", maxWidth: 1200, mx: "auto" }}>
+        <UserTable
+          onEdit={(user) => setEditUser(user)}
+          onDelete={(user) => setDeleteUser(user)}
+          onEditTeam={(user) => setEditTeamUser(user)}
+          refresh={refreshTable}
+        />
+      </Box>
       {editUser && (
         <UserEditModal
           user={editUser}

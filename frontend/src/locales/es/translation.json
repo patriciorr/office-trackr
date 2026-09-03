@@ -3,8 +3,8 @@
   "register": "Registrarse",
   "logout": "Cerrar sesión",
   "calendar": "Calendario",
-  "dashboard": "Dashboard de Manager",
-  "admin": "Dashboard de Administración",
+  "dashboard": "Panel de Manager",
+  "admin": "Panel de Administración",
   "event_saved": "Evento guardado correctamente",
   "event_deleted": "Evento eliminado correctamente",
   "event_error": "Error guardando evento",
@@ -99,5 +99,7 @@
   "previous_page": "página anterior",
   "next_page": "página siguiente",
   "last_page": "última página",
-  "admin_panel": "Dashboard de Administración"
+  "admin_panel": "Panel de Administración"
+  ,"open_navigation": "Abrir navegación"
+  ,"change_language": "Cambiar idioma"
 }

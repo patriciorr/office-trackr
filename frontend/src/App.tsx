@@ -11,6 +11,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Calendar, { CalendarEvent } from "./components/Calendar";
 import DayEventModal from "./components/DayEventModal";
+import DayEventPanel from "./components/DayEventPanel";
 import Navbar from "./components/Navbar";
 import UserEdit from "./components/UserEdit";
 import { AuthContext } from "./context/AuthContext";
@@ -22,12 +23,15 @@ import Container from "@mui/material/Container";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import esLocale from "./locales/es/muiLocaleEs";
 import enLocale from "./locales/en/muiLocaleEn";
 import { muiLocales } from "./locales/muiLocales";
 import { useTranslation } from "react-i18next";
+import "./App.css";
+import { surfaceColors } from "./themeColors";
 
 interface WorkerSummary {
   userId: string;
@@ -41,6 +45,7 @@ const App: React.FC = () => {
   const { user, setUser } = useContext(AuthContext);
   const role = user?.role || "coworker";
   const { t, i18n } = useTranslation();
+  const isSmallScreen = useMediaQuery("(max-width:899px)");
   const [language, setLanguage] = useState<"es" | "en">(() => {
     return (localStorage.getItem("language") as "es" | "en") || "es";
   });
@@ -101,6 +106,7 @@ const App: React.FC = () => {
       });
       fetch(`http://localhost:5000/api/events?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
       })
         .then((res) => res.json())
         .then((data) => setMonthEvents(data))
@@ -143,6 +149,12 @@ const App: React.FC = () => {
     } catch {}
   }, [token]);
 
+  useEffect(() => {
+    if (!isSmallScreen) {
+      setModalOpen(false);
+    }
+  }, [isSmallScreen]);
+
   const handleRegister = (token: string, userObj: any) => {
     setShowRegister(false);
     setToken(token);
@@ -151,8 +163,15 @@ const App: React.FC = () => {
     localStorage.setItem("user", JSON.stringify(userObj));
   };
 
+  const formatLocalDate = (date: Date) => {
+    const pad = (value: number) => value.toString().padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+      date.getDate(),
+    )}`;
+  };
+
   const handleSelectDay = (date: Date) => {
-    const isoDate = date.toISOString().slice(0, 10);
+    const isoDate = formatLocalDate(date);
     setModalDate(isoDate);
     const event = monthEvents.find((e) => {
       const eventDate =
@@ -163,7 +182,7 @@ const App: React.FC = () => {
     });
     setModalEvent(event);
     setModalMode(event ? "edit" : "add");
-    setModalOpen(true);
+    setModalOpen(isSmallScreen);
   };
 
   // TODO: Implement range selection
@@ -174,9 +193,9 @@ const App: React.FC = () => {
   const handleSaveEvent = async (event: CalendarEvent) => {
     if (!token || !user) return;
     try {
-      const method = modalMode === "edit" ? "PUT" : "POST";
+      const method = event.id ? "PUT" : "POST";
       const url =
-        modalMode === "edit"
+        event.id
           ? `http://localhost:5000/api/events/${event.id}`
           : "http://localhost:5000/api/events";
       const res = await fetch(url, {
@@ -208,23 +227,33 @@ const App: React.FC = () => {
     } catch {
       setFeedback({ type: "error", message: t("event_error") });
     }
-    setModalOpen(false);
-    setSelectedDate(null);
-    setModalEvent(undefined);
+    if (isSmallScreen) {
+      setModalOpen(false);
+      setSelectedDate(null);
+      setModalEvent(undefined);
+    } else {
+      setModalEvent(event);
+    }
   };
 
-  const handleDeleteEvent = async () => {
+  const handleDeleteEvent = async (eventToDelete = modalEvent) => {
     if (!token || !user) return;
     try {
-      if (!modalEvent) return;
+      if (!eventToDelete?.id) {
+        setFeedback({ type: "error", message: t("delete_error") });
+        return;
+      }
       const res = await fetch(
-        `http://localhost:5000/api/events/${modalEvent.id}`,
+        `http://localhost:5000/api/events/${eventToDelete.id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         }
       );
       if (!res.ok) throw new Error("Error eliminando evento");
+      setMonthEvents((previousEvents) =>
+        previousEvents.filter((event) => event.id !== eventToDelete.id),
+      );
       setFeedback({
         type: "success",
         message: t("event_deleted"),
@@ -239,15 +268,21 @@ const App: React.FC = () => {
         `http://localhost:5000/api/events?${params.toString()}`,
         {
           headers: { Authorization: `Bearer ${token}` },
+          cache: "no-store",
         }
       );
       setMonthEvents(await updated.json());
     } catch {
       setFeedback({ type: "error", message: t("delete_error") });
     }
-    setModalOpen(false);
-    setSelectedDate(null);
-    setModalEvent(undefined);
+    if (isSmallScreen) {
+      setModalOpen(false);
+      setSelectedDate(null);
+      setModalEvent(undefined);
+    } else {
+      setModalEvent(undefined);
+      setModalDate(null);
+    }
   };
 
   const handleCloseModal = () => {
@@ -256,30 +291,37 @@ const App: React.FC = () => {
     setModalEvent(undefined);
   };
 
+  const surfaces = isDarkMode ? surfaceColors.dark : surfaceColors.light;
   const theme = createTheme({
     palette: {
       mode: isDarkMode ? "dark" : "light",
-      primary: { main: isDarkMode ? "#4b6cb7" : "#1976d2" },
-      secondary: { main: isDarkMode ? "#6a89cc" : "#90caf9" },
+      primary: { main: isDarkMode ? "#67d9e8" : "#1769aa" },
+      secondary: { main: isDarkMode ? "#f6c85f" : "#c48600" },
       background: {
-        default: isDarkMode ? "#232946" : "#eaf0fa",
-        paper: isDarkMode ? "#1a1f2b" : "#fff",
+        default: surfaces.background,
+        paper: surfaces.paper,
       },
       text: {
-        primary: isDarkMode ? "#eaf0fa" : "#232946",
-        secondary: isDarkMode ? "#b8c1ec" : "#6a89cc",
+        primary: isDarkMode ? "#edf7f8" : "#183247",
+        secondary: isDarkMode ? "#a9c2c7" : "#557083",
       },
     },
     typography: {
-      fontFamily: "Roboto, Arial, sans-serif",
+      fontFamily: "'Manrope', sans-serif",
+      h1: { fontFamily: "'Plus Jakarta Sans', sans-serif" },
+      h2: { fontFamily: "'Plus Jakarta Sans', sans-serif" },
+      h3: { fontFamily: "'Plus Jakarta Sans', sans-serif" },
+      h4: { fontFamily: "'Plus Jakarta Sans', sans-serif" },
+      h5: { fontFamily: "'Plus Jakarta Sans', sans-serif" },
+      h6: { fontFamily: "'Plus Jakarta Sans', sans-serif" },
     },
     components: {
       MuiAlert: {
         styleOverrides: {
           root: {
-            backgroundColor: isDarkMode ? "#232946" : "#eaf0fa",
-            color: isDarkMode ? "#eaf0fa" : "#232946",
-            border: "1px solid #90caf9",
+            backgroundColor: surfaces.raised,
+            color: isDarkMode ? "#edf7f8" : "#183247",
+            border: `1px solid ${surfaces.border}`,
           },
         },
       },
@@ -352,7 +394,7 @@ const App: React.FC = () => {
           isDarkMode={isDarkMode}
           onToggleDarkMode={() => setIsDarkMode((v) => !v)}
           role={role}
-          onTabChange={(tab) => {
+          onTabChange={(tab: string) => {
             if (["calendar", "dashboard", "admin"].includes(tab)) {
               setActiveTab(tab as "calendar" | "dashboard" | "admin");
             }
@@ -360,7 +402,7 @@ const App: React.FC = () => {
           activeTab={activeTab}
           onLogout={handleLogout}
           language={language}
-          onLanguageChange={(lang) => {
+          onLanguageChange={(lang: "es" | "en") => {
             setLanguage(lang);
             i18n.changeLanguage(lang);
           }}
@@ -373,20 +415,23 @@ const App: React.FC = () => {
                 dateAdapter={AdapterDateFns}
                 adapterLocale={language === "es" ? esLocale : enLocale}
               >
-                <Container maxWidth="md" sx={{ py: 4 }}>
-                  {activeTab === "calendar" && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: { xs: "column", md: "row" },
-                        alignItems: { xs: "center", md: "flex-start" },
-                        gap: 3,
-                      }}
-                    >
+                <>
+                  <Container maxWidth="lg" sx={{ py: 4 }}>
+                    {activeTab === "calendar" && (
                       <Box
                         sx={{
-                          width: { xs: "100%", md: "33%" },
+                          display: "flex",
+                          flexDirection: { xs: "column", md: "row" },
+                          alignItems: { xs: "center", md: "flex-start" },
+                          gap: 3,
+                        }}
+                      >
+                      <Box
+                        sx={{
+                          width: { xs: "100%", md: "28%" },
+                          flex: { xs: "none", md: 1.25 },
                           mb: { xs: 2, md: 0 },
+                          order: { xs: 2, md: 1 },
                         }}
                       >
                         <Counter
@@ -396,7 +441,13 @@ const App: React.FC = () => {
                           isDarkMode={isDarkMode}
                         />
                       </Box>
-                      <Box sx={{ flex: 1, width: { xs: "100%", md: "67%" } }}>
+                      <Box
+                        sx={{
+                          flex: { xs: "none", md: 1.8 },
+                          width: { xs: "100%", md: "auto" },
+                          order: { xs: 1, md: 2 },
+                        }}
+                      >
                         <Calendar
                           events={monthEvents}
                           onSelectDay={handleSelectDay}
@@ -407,9 +458,40 @@ const App: React.FC = () => {
                           }}
                         />
                       </Box>
-                    </Box>
+                      <Box
+                        sx={{
+                          flex: { xs: "none", md: 1.2 },
+                          width: { xs: "100%", md: "auto" },
+                          order: 3,
+                          display: { xs: "none", md: "block" },
+                        }}
+                      >
+                        {modalDate && (
+                          <DayEventPanel
+                            date={modalDate}
+                            event={monthEvents.find(
+                              (event) => event.date.slice(0, 10) === modalDate,
+                            )}
+                            onSave={handleSaveEvent}
+                            onDelete={handleDeleteEvent}
+                            isDarkMode={isDarkMode}
+                          />
+                        )}
+                      </Box>
+                      </Box>
+                    )}
+                  </Container>
+                  {isSmallScreen && modalOpen && modalDate && (
+                    <DayEventModal
+                      date={modalDate}
+                      event={modalEvent}
+                      onSave={handleSaveEvent}
+                      onDelete={modalEvent ? handleDeleteEvent : undefined}
+                      onClose={handleCloseModal}
+                      isDarkMode={isDarkMode}
+                    />
                   )}
-                </Container>
+                </>
               </LocalizationProvider>
             }
           />
@@ -435,16 +517,6 @@ const App: React.FC = () => {
             }
           />
         </Routes>
-        {modalOpen && modalDate && (
-          <DayEventModal
-            date={modalDate}
-            event={modalEvent}
-            onSave={handleSaveEvent}
-            onDelete={modalEvent ? handleDeleteEvent : undefined}
-            onClose={handleCloseModal}
-            isDarkMode={isDarkMode}
-          />
-        )}
         <Snackbar
           open={!!feedback}
           autoHideDuration={4000}

@@ -10,6 +10,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
+import { surfaceColors } from "../themeColors";
 
 interface RegisterProps {
   onRegister: (token: string, user: any) => void;
@@ -132,8 +133,8 @@ const Register: React.FC<RegisterProps> = ({
           p: 3,
           boxShadow: 3,
           borderRadius: 2,
-          background: isDarkMode ? "#232946" : "#f4f4f4",
-          color: isDarkMode ? "#eaf0fa" : "#232946",
+          background: isDarkMode ? surfaceColors.dark.paper : surfaceColors.light.paper,
+          color: isDarkMode ? "#edf7f8" : "#183247",
         }}
       >
         <Typography variant="h5" sx={{ mb: 2, fontWeight: 700 }}>

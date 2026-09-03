@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { DateCalendar, PickersDay, PickersDayProps } from "@mui/x-date-pickers";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { eventColors } from "../themeColors";
+import { surfaceColors } from "../themeColors";
 
 export type CalendarEventType = "office" | "vacation";
 
@@ -19,8 +21,10 @@ interface CalendarProps {
   isDarkMode?: boolean;
 }
 
-function CustomDay(props: PickersDayProps & { events: CalendarEvent[] }) {
-  const { day, events, ...other } = props;
+function CustomDay(
+  props: PickersDayProps & { events: CalendarEvent[]; isDarkMode: boolean },
+) {
+  const { day, events, isDarkMode, ...other } = props;
 
   const pad = (n: number) => n.toString().padStart(2, "0");
   const dateStr = `${day.getFullYear()}-${pad(day.getMonth() + 1)}-${pad(
@@ -37,19 +41,23 @@ function CustomDay(props: PickersDayProps & { events: CalendarEvent[] }) {
   });
   let sx = {};
   if (event?.type === "office") {
+    const color = isDarkMode ? eventColors.office.dark : eventColors.office.light;
     sx = {
-      backgroundColor: "#e53935",
-      color: "#fff",
+      backgroundColor: color.main,
+      color: isDarkMode ? "#142027" : "#fff",
       "&:hover": {
-        backgroundColor: "#d32f2f",
+        backgroundColor: color.hover,
       },
     };
   } else if (event?.type === "vacation") {
+    const color = isDarkMode
+      ? eventColors.vacation.dark
+      : eventColors.vacation.light;
     sx = {
-      backgroundColor: "#43a047",
-      color: "#fff",
+      backgroundColor: color.main,
+      color: isDarkMode ? "#142027" : "#fff",
       "&:hover": {
-        backgroundColor: "#388e3c",
+        backgroundColor: color.hover,
       },
     };
   }
@@ -88,8 +96,8 @@ const Calendar: React.FC<CalendarProps> = ({
         flexDirection: "column",
         alignItems: "center",
         py: 2,
-        background: isDarkMode ? "#232946" : "#fff",
-        color: isDarkMode ? "#eaf0fa" : "#232946",
+        background: isDarkMode ? surfaceColors.dark.paper : surfaceColors.light.paper,
+        color: isDarkMode ? "#edf7f8" : "#183247",
         borderRadius: 3,
         boxShadow: 3,
       }}
@@ -107,7 +115,9 @@ const Calendar: React.FC<CalendarProps> = ({
         minDate={new Date(currentYear - 2, currentMonth, 1)}
         maxDate={new Date(currentYear + 2, currentMonth, 1)}
         slots={{
-          day: (props: any) => <CustomDay {...props} events={events} />,
+          day: (props: any) => (
+            <CustomDay {...props} events={events} isDarkMode={isDarkMode} />
+          ),
         }}
         sx={{ width: "100%" }}
       />

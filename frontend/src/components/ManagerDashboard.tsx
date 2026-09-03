@@ -10,33 +10,107 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { PickersCalendarHeaderProps } from "@mui/x-date-pickers/PickersCalendarHeader";
+import { addMonths, addYears, isAfter, isBefore } from "date-fns";
 import { es, enUS } from "date-fns/locale";
 import CloseIcon from "@mui/icons-material/Close";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
+import { eventColors } from "../themeColors";
+import { surfaceColors } from "../themeColors";
 
 interface ManagerDashboardProps {
   isDarkMode?: boolean;
 }
-
-const colorMap: Record<string, string> = {
-  office: "#e53935",
-  vacation: "#43a047",
-  telework: "#1976d2",
-};
 
 const style = {
   position: "absolute" as const,
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: { xs: "calc(100% - 32px)", sm: 400 },
   bgcolor: "background.paper",
   borderRadius: 2,
   boxShadow: 24,
   p: 4,
+};
+
+const minPickerDate = new Date(2022, 0, 1);
+const maxPickerDate = new Date(2100, 11, 31);
+
+const CalendarHeader: React.FC<PickersCalendarHeaderProps> = ({
+  currentMonth,
+  onMonthChange,
+}) => {
+  const previousYear = addYears(currentMonth, -1);
+  const previousMonth = addMonths(currentMonth, -1);
+  const nextMonth = addMonths(currentMonth, 1);
+  const nextYear = addYears(currentMonth, 1);
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        px: 1,
+        py: 0.5,
+      }}
+    >
+      <Box sx={{ display: "flex" }}>
+        <IconButton
+          size="small"
+          title="Previous year"
+          aria-label="Previous year"
+          onClick={() => onMonthChange(previousYear)}
+          disabled={isBefore(previousYear, minPickerDate)}
+        >
+          <KeyboardDoubleArrowLeftIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          title="Previous month"
+          aria-label="Previous month"
+          onClick={() => onMonthChange(previousMonth)}
+          disabled={isBefore(previousMonth, minPickerDate)}
+        >
+          <ChevronLeftIcon />
+        </IconButton>
+      </Box>
+      <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+        {`${currentMonth.toLocaleDateString(i18n.language, {
+          month: "long",
+        })} ${currentMonth.getFullYear()}`}
+      </Typography>
+      <Box sx={{ display: "flex" }}>
+        <IconButton
+          size="small"
+          title="Next month"
+          aria-label="Next month"
+          onClick={() => onMonthChange(nextMonth)}
+          disabled={isAfter(nextMonth, maxPickerDate)}
+        >
+          <ChevronRightIcon />
+        </IconButton>
+        <IconButton
+          size="small"
+          title="Next year"
+          aria-label="Next year"
+          onClick={() => onMonthChange(nextYear)}
+          disabled={isAfter(nextYear, maxPickerDate)}
+        >
+          <KeyboardDoubleArrowRightIcon />
+        </IconButton>
+      </Box>
+    </Box>
+  );
 };
 
 const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
@@ -44,6 +118,15 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 }) => {
   const { t } = useTranslation();
   const { user, setUser } = useContext(AuthContext);
+  const colorMap = isDarkMode
+    ? {
+        office: eventColors.office.dark.main,
+        vacation: eventColors.vacation.dark.main,
+      }
+    : {
+        office: eventColors.office.light.main,
+        vacation: eventColors.vacation.light.main,
+      };
   const [coworkers, setCoworkers] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -150,41 +233,66 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 4,
-        p: 4,
+        gap: { xs: 3, md: 5 },
+        p: { xs: 2, sm: 3, md: 4 },
         justifyContent: "center",
-        background: isDarkMode ? "#232946" : "#fff",
-        color: isDarkMode ? "#eaf0fa" : "#232946",
+        background: isDarkMode ? surfaceColors.dark.paper : surfaceColors.light.paper,
+        color: isDarkMode ? "#edf7f8" : "#183247",
         borderRadius: 3,
         boxShadow: 3,
       }}
     >
-      <Box sx={{ mb: 3, display: "flex", justifyContent: "center" }}>
-        <LocalizationProvider
-          key={i18n.language}
-          dateAdapter={AdapterDateFns}
-          adapterLocale={i18n.language === "es" ? es : enUS}
-        >
-          <DatePicker
-            views={["month", "year"]}
-            label={t("select_month")}
-            minDate={new Date(2022, 0, 1)}
-            maxDate={new Date(2100, 11, 31)}
-            value={selectedDate}
-            onChange={(newValue) => setSelectedDate(newValue)}
-            slotProps={{ textField: { fullWidth: true } }}
-          />
-        </LocalizationProvider>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 4,
-          justifyContent: "center",
-        }}
-      >
-        {coworkers.map((worker) => (
+      {(coworkers.length === 0 || availableCoworkers.length > 0) && (
+        <Box sx={{ display: "flex", justifyContent: "center", mb: { xs: 0, md: 1 } }}>
+          <Button
+            variant="contained"
+            startIcon={<PersonAddAlt1Icon />}
+            onClick={() => setModalOpen(true)}
+            sx={{
+              minHeight: 44,
+              px: { xs: 2, sm: 3 },
+              fontWeight: 700,
+            }}
+          >
+            {t("add_coworker")}
+          </Button>
+        </Box>
+      )}
+      {coworkers.length > 0 && (
+        <>
+          <Box sx={{ display: "flex", justifyContent: "center", px: { xs: 1, sm: 0 } }}>
+            <LocalizationProvider
+              key={i18n.language}
+              dateAdapter={AdapterDateFns}
+              adapterLocale={i18n.language === "es" ? es : enUS}
+            >
+              <DateCalendar
+                minDate={minPickerDate}
+                maxDate={maxPickerDate}
+                value={selectedDate}
+                onChange={(newValue) => setSelectedDate(newValue)}
+                onMonthChange={(newMonth) => setSelectedDate(newMonth)}
+                slots={{ calendarHeader: CalendarHeader }}
+                sx={{
+                  "& .MuiDayCalendar-root, & .MuiPickersFadeTransitionGroup-root": {
+                    display: "none",
+                  },
+                  height: "auto",
+                  minHeight: "auto",
+                  overflow: "hidden",
+                }}
+              />
+            </LocalizationProvider>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: { xs: 2, sm: 3, md: 4 },
+              justifyContent: "center",
+            }}
+          >
+            {coworkers.map((worker) => (
           <Box
             key={worker.id}
             sx={{ position: "relative", display: "inline-block" }}
@@ -192,7 +300,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
             <Paper
               elevation={3}
               sx={{
-                background: isDarkMode ? "#232946" : "#fff",
+                background: isDarkMode ? surfaceColors.dark.paper : surfaceColors.light.paper,
                 borderRadius: 3,
                 minWidth: 260,
                 p: 3,
@@ -213,7 +321,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 variant="h6"
                 sx={{
                   fontWeight: 700,
-                  color: isDarkMode ? "#eaf0fa" : "#1b1b1b",
+                  color: isDarkMode ? "#edf7f8" : "#183247",
                   mb: 1,
                 }}
               >
@@ -245,13 +353,10 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
               </Box>
             </Paper>
           </Box>
-        ))}
-        {availableCoworkers.length > 0 && (
-          <Button variant="contained" onClick={() => setModalOpen(true)}>
-            {t("add_coworker")}
-          </Button>
-        )}
-      </Box>
+            ))}
+          </Box>
+        </>
+      )}
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box sx={style}>
           <Typography variant="h6" mb={2}>

@@ -4,18 +4,17 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
+import Box from "@mui/material/Box";
 import { CalendarEventType, CalendarEvent } from "./Calendar";
 import { useTranslation } from "react-i18next";
+import { eventColors } from "../themeColors";
+import { surfaceColors } from "../themeColors";
 
 interface DayEventModalProps {
   date: string;
   event?: CalendarEvent;
   onSave: (event: CalendarEvent) => void;
-  onDelete?: () => void;
+  onDelete?: (event: CalendarEvent) => void;
   onClose: () => void;
   isDarkMode?: boolean;
 }
@@ -29,11 +28,14 @@ const DayEventModal: React.FC<DayEventModalProps> = ({
   isDarkMode = false,
 }) => {
   const { t } = useTranslation();
-  const [type, setType] = useState<CalendarEventType>(event?.type || "office");
+  const colors = isDarkMode ? { office: eventColors.office.dark, vacation: eventColors.vacation.dark } : { office: eventColors.office.light, vacation: eventColors.vacation.light };
+  const [type, setType] = useState<CalendarEventType | null>(
+    event?.type || null,
+  );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave({ ...event, date, type });
+  const handleTypeSelect = (selectedType: CalendarEventType) => {
+    setType(selectedType);
+    onSave({ ...event, date, type: selectedType });
   };
 
   return (
@@ -42,52 +44,65 @@ const DayEventModal: React.FC<DayEventModalProps> = ({
       onClose={onClose}
       PaperProps={{
         sx: {
-          background: isDarkMode ? "#232946" : "#fff",
-          color: isDarkMode ? "#eaf0fa" : "#232946",
+          background: isDarkMode ? surfaceColors.dark.paper : surfaceColors.light.paper,
+          color: isDarkMode ? "#edf7f8" : "#183247",
         },
       }}
     >
-      <form onSubmit={handleSubmit}>
+      <Box>
         <DialogTitle>
           {event ? t("edit_event") : t("add_event")}{" "}
           {t("for_date", { date: date })}
         </DialogTitle>
         <DialogContent>
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel id="type-label">{t("event_type")}</InputLabel>
-            <Select
-              labelId="type-label"
-              value={type}
-              label={t("event_type")}
-              onChange={(e) => setType(e.target.value as CalendarEventType)}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            <Button
+              variant={type === "office" ? "contained" : "outlined"}
+              onClick={() => handleTypeSelect("office")}
+              sx={{
+                color: type === "office"
+                  ? isDarkMode ? "#142027" : "#fff"
+                  : colors.office.main,
+                borderColor: colors.office.main,
+                backgroundColor:
+                  type === "office" ? colors.office.main : "transparent",
+                "&:hover": { backgroundColor: colors.office.hover, color: "#fff" },
+              }}
             >
-              <MenuItem value="office">{t("office")}</MenuItem>
-              <MenuItem value="vacation">{t("vacation")}</MenuItem>
-            </Select>
-          </FormControl>
+              {t("office")}
+            </Button>
+            <Button
+              variant={type === "vacation" ? "contained" : "outlined"}
+              onClick={() => handleTypeSelect("vacation")}
+              sx={{
+                color: type === "vacation"
+                  ? isDarkMode ? "#142027" : "#fff"
+                  : colors.vacation.main,
+                borderColor: colors.vacation.main,
+                backgroundColor:
+                  type === "vacation" ? colors.vacation.main : "transparent",
+                "&:hover": { backgroundColor: colors.vacation.hover, color: "#fff" },
+              }}
+            >
+              {t("vacation")}
+            </Button>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ background: "#888", color: "#fff" }}
-          >
-            {t("save")}
-          </Button>
-          {onDelete && (
+          {event && onDelete && (
             <Button
-              type="button"
-              sx={{ background: "#bbb", color: "#222", ml: 2 }}
-              onClick={onDelete}
+              color="inherit"
+              variant="outlined"
+              onClick={() => onDelete(event)}
             >
               {t("delete")}
             </Button>
           )}
-          <Button type="button" onClick={onClose}>
+          <Button onClick={onClose}>
             {t("cancel")}
           </Button>
         </DialogActions>
-      </form>
+      </Box>
     </Dialog>
   );
 };

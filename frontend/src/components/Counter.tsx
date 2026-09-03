@@ -4,6 +4,8 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import { CalendarEvent } from "./Calendar";
+import { eventColors, progressColors } from "../themeColors";
+import { surfaceColors } from "../themeColors";
 
 interface CounterProps {
   events: CalendarEvent[];
@@ -73,44 +75,44 @@ const Counter: React.FC<CounterProps> = ({
       ? 0
       : Math.round(Math.min(officeDays / laborDaysNoVacation.length, 1) * 100);
 
-  let circleColor = "#e53935";
+  const colors = isDarkMode ? progressColors.dark : progressColors.light;
+  let circleColor = colors.low;
   if (percentOfRequired === 100) {
-    circleColor = "#43a047";
+    circleColor = colors.success;
   } else if (percentOfLaborDays >= 40) {
-    circleColor = "#43a047";
+    circleColor = colors.success;
   } else if (percentOfLaborDays >= 30) {
-    circleColor = "#ffd600";
+    circleColor = colors.warning;
   } else if (percentOfLaborDays >= 20) {
-    circleColor = "#ffa726";
-  } else if (percentOfLaborDays >= 10) {
-    circleColor = "#ff7043";
+    circleColor = isDarkMode ? "#e9a86a" : "#c9764b";
   }
 
   return (
     <Box
       sx={{
-        p: 3,
+        p: { xs: 3, md: 4 },
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         height: "100%",
-        background: isDarkMode ? "#232946" : "#fff",
-        color: isDarkMode ? "#eaf0fa" : "#232946",
+        background: isDarkMode ? surfaceColors.dark.paper : surfaceColors.light.paper,
+        color: isDarkMode ? "#edf7f8" : "#183247",
         borderRadius: 3,
         boxShadow: 3,
       }}
     >
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
         {t("monthly_summary")}
       </Typography>
-      <Box sx={{ position: "relative", display: "inline-flex", mb: 2 }}>
+      <Box sx={{ position: "relative", display: "inline-flex", mb: 3 }}>
+        <CircularProgress variant="determinate" value={100} size={112} thickness={5.5} sx={{ color: colors.track }} />
         <CircularProgress
           variant="determinate"
           value={percentOfRequired}
-          size={90}
-          thickness={5}
-          sx={{ color: circleColor }}
+          size={112}
+          thickness={5.5}
+          sx={{ color: circleColor, position: "absolute", left: 0 }}
         />
         <Box
           sx={{
@@ -124,12 +126,12 @@ const Counter: React.FC<CounterProps> = ({
             justifyContent: "center",
           }}
         >
-          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>
             {percentOfRequired}%
           </Typography>
         </Box>
       </Box>
-      <Typography variant="body2" sx={{ mb: 2, textAlign: "center" }}>
+      <Typography variant="body1" sx={{ mb: 3, textAlign: "center" }}>
         {t("office_progress", {
           office: officeDays,
           required: requiredOfficeDays,
@@ -137,17 +139,17 @@ const Counter: React.FC<CounterProps> = ({
       </Typography>
       <Typography
         variant="body1"
-        sx={{ color: "#e53935", fontWeight: 600, mb: 1 }}
+        sx={{ color: isDarkMode ? eventColors.office.dark.main : eventColors.office.light.main, fontWeight: 700, mb: 1.5 }}
       >
         {t("office_days")}: {officeDays}
       </Typography>
       <Typography
         variant="body1"
-        sx={{ color: "#43a047", fontWeight: 600, mb: 1 }}
+        sx={{ color: isDarkMode ? eventColors.vacation.dark.main : eventColors.vacation.light.main, fontWeight: 700, mb: 1.5 }}
       >
         {t("vacation_days")}: {vacationDays}
       </Typography>
-      <Typography variant="body1" sx={{ color: "#1976d2", fontWeight: 600 }}>
+      <Typography variant="body1" sx={{ color: isDarkMode ? eventColors.telework.dark.main : eventColors.telework.light.main, fontWeight: 700 }}>
         {t("telework_days")}: {teleworkDays}
       </Typography>
     </Box>

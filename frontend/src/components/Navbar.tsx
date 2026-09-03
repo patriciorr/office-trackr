@@ -4,16 +4,35 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import { useTranslation } from "react-i18next";
-import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import ReactCountryFlag from "react-country-flag";
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import { useTranslation } from "react-i18next";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import MenuIcon from "@mui/icons-material/Menu";
+import logoLight from "../assets/office-trackr-logo-light.svg";
+import logoDark from "../assets/office-trackr-logo-dark.svg";
+import TranslateIcon from "@mui/icons-material/Translate";
+
+type LanguageCode = "es" | "en";
+
+const languageOptions: Array<{
+  code: LanguageCode;
+  label: string;
+  countryCode: string;
+}> = [
+  { code: "es", label: "Español", countryCode: "ES" },
+  { code: "en", label: "English", countryCode: "GB" },
+];
 
 interface NavbarProps {
   isDarkMode: boolean;
@@ -22,8 +41,8 @@ interface NavbarProps {
   onTabChange?: (tab: string) => void;
   activeTab?: string;
   onLogout?: () => void;
-  language: "es" | "en";
-  onLanguageChange: (lang: "es" | "en") => void;
+  language: LanguageCode;
+  onLanguageChange: (lang: LanguageCode) => void;
   minimal?: boolean;
 }
 
@@ -41,150 +60,147 @@ const Navbar: React.FC<NavbarProps> = ({
   const { t } = useTranslation();
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const isMobile = useMediaQuery("(max-width:899px)");
+  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
+  const [navMenuAnchor, setNavMenuAnchor] = useState<null | HTMLElement>(null);
+  const [languageMenuAnchor, setLanguageMenuAnchor] = useState<null | HTMLElement>(null);
 
-  const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const tabs = [
+    { label: t("calendar"), value: "calendar", icon: <CalendarMonthIcon fontSize="small" /> },
+    ...(role === "manager"
+      ? [{ label: t("dashboard"), value: "dashboard", icon: <DashboardIcon fontSize="small" /> }]
+      : []),
+    ...(role === "admin"
+      ? [{ label: t("admin"), value: "admin", icon: <AdminPanelSettingsIcon fontSize="small" /> }]
+      : []),
+  ];
+
+  const handleTabClick = (tab: string) => {
+    setNavMenuAnchor(null);
+    onTabChange?.(tab);
+    navigate(tab === "calendar" ? "/" : `/${tab}`);
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleEditUser = () => {
-    navigate("/edit-user");
-    setAnchorEl(null);
-  };
-
-  const handleLogoutClick = () => {
-    navigate("/");
-    if (onLogout) onLogout();
-    setAnchorEl(null);
+  const handleLanguageChange = (nextLanguage: LanguageCode) => {
+    onLanguageChange(nextLanguage);
+    setLanguageMenuAnchor(null);
+    setNavMenuAnchor(null);
   };
 
   const handleLogoClick = () => {
     navigate("/");
-    if (onTabChange) onTabChange("calendar");
+    onTabChange?.("calendar");
   };
 
-  const tabs = [
-    { label: t("calendar"), value: "calendar" },
-    ...(role === "manager"
-      ? [{ label: t("dashboard"), value: "dashboard" }]
-      : []),
-    ...(role === "admin" ? [{ label: t("admin"), value: "admin" }] : []),
-  ];
-
-  const handleTabClick = (tab: string) => {
-    if (onTabChange) onTabChange(tab);
-    if (tab === "calendar") navigate("/");
-    else if (tab === "dashboard") navigate("/dashboard");
-    else if (tab === "admin") navigate("/admin");
+  const handleLogout = () => {
+    setUserMenuAnchor(null);
+    navigate("/");
+    onLogout?.();
   };
 
   return (
-    <AppBar
-      position="static"
-      color={isDarkMode ? "default" : "inherit"}
-      elevation={1}
-    >
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <img
-            src="src/assets/agenda.png"
+    <AppBar position="static" color="transparent" elevation={0}>
+      <Toolbar
+        sx={{
+          minHeight: { xs: 64, md: 76 },
+          px: { xs: 1.5, sm: 3, md: 5 },
+          gap: 1,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, md: 1.5 }, minWidth: 0 }}>
+          <Box
+            component="img"
+            src={isDarkMode ? logoDark : logoLight}
             alt="Logo"
-            style={{ height: 32, cursor: "pointer" }}
             onClick={handleLogoClick}
+            sx={{ height: { xs: 30, md: 36 }, width: "auto", cursor: "pointer" }}
           />
           <Typography
             variant="h6"
-            sx={{ fontWeight: 700, color: "#555", cursor: "pointer" }}
             onClick={handleLogoClick}
+            sx={{
+              fontWeight: 800,
+              color: "text.primary",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              fontSize: { xs: "1.05rem", md: "1.3rem" },
+            }}
           >
             {t("app_name", { defaultValue: "OfficeTrackr" })}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {!minimal &&
-            tabs.map((tab, idx) => (
-              <Button
-                key={tab.value}
-                onClick={() => handleTabClick(tab.value)}
-                color={activeTab === tab.value ? "primary" : "inherit"}
-                sx={{
-                  fontWeight: activeTab === tab.value ? 700 : 400,
-                  borderBottom:
-                    activeTab === tab.value ? "2px solid #1976d2" : "none",
-                  borderRadius: 0,
-                }}
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0, md: 1 }, ml: "auto" }}>
+          {!minimal && !isMobile && tabs.map((tab) => (
+            <Button
+              key={tab.value}
+              startIcon={tab.icon}
+              onClick={() => handleTabClick(tab.value)}
+              color={activeTab === tab.value ? "primary" : "inherit"}
+              sx={{
+                fontWeight: activeTab === tab.value ? 800 : 600,
+                borderBottom: activeTab === tab.value ? "2px solid" : "2px solid transparent",
+                borderRadius: 0,
+              }}
+            >
+              {tab.label}
+            </Button>
+          ))}
+          {!minimal && isMobile && (
+            <>
+              <IconButton color="inherit" onClick={(event) => setNavMenuAnchor(event.currentTarget)} aria-label={t("open_navigation")}>
+                <MenuIcon />
+              </IconButton>
+              <Menu anchorEl={navMenuAnchor} open={Boolean(navMenuAnchor)} onClose={() => setNavMenuAnchor(null)}>
+                {tabs.map((tab) => (
+                  <MenuItem key={tab.value} onClick={() => handleTabClick(tab.value)}>
+                    {tab.icon}
+                    <Typography sx={{ ml: 1 }}>{tab.label}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </>
+          )}
+          <IconButton color="inherit" onClick={onToggleDarkMode} aria-label={isDarkMode ? t("light_mode") : t("dark_mode")}>
+            {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
+          </IconButton>
+          <IconButton
+            color="inherit"
+            onClick={(event) => setLanguageMenuAnchor(event.currentTarget)}
+            aria-label={t("change_language")}
+            title={t("change_language")}
+          >
+            <TranslateIcon />
+          </IconButton>
+          <Menu
+            anchorEl={languageMenuAnchor}
+            open={Boolean(languageMenuAnchor)}
+            onClose={() => setLanguageMenuAnchor(null)}
+          >
+            {languageOptions.map((option) => (
+              <MenuItem
+                key={option.code}
+                selected={language === option.code}
+                onClick={() => handleLanguageChange(option.code)}
               >
-                {tab.label}
-              </Button>
+                <ReactCountryFlag countryCode={option.countryCode} svg />
+                <Typography sx={{ ml: 1 }}>{option.label}</Typography>
+              </MenuItem>
             ))}
-          <Button
-            onClick={onToggleDarkMode}
-            variant="outlined"
-            color={isDarkMode ? "secondary" : "primary"}
-            sx={{ minWidth: 40, ml: 2, borderRadius: "50%" }}
-            title={isDarkMode ? t("light_mode") : t("dark_mode")}
-          >
-            {isDarkMode ? (
-              <span role="img" aria-label={t("light_mode")}>
-                🌞
-              </span>
-            ) : (
-              <span role="img" aria-label={t("dark_mode")}>
-                🌙
-              </span>
-            )}
-          </Button>
-          <ToggleButtonGroup
-            value={language}
-            exclusive
-            onChange={(_, lang) => lang && onLanguageChange(lang)}
-            sx={{ ml: 2 }}
-          >
-            <ToggleButton
-              value="es"
-              sx={{ p: 0, borderRadius: "50%" }}
-              title="Español"
-            >
-              <ReactCountryFlag
-                countryCode="ES"
-                svg
-                style={{ width: 24, height: 24, borderRadius: "50%" }}
-                title="Español"
-              />
-            </ToggleButton>
-            <ToggleButton
-              value="en"
-              sx={{ p: 0, borderRadius: "50%" }}
-              title="English"
-            >
-              <ReactCountryFlag
-                countryCode="GB"
-                svg
-                style={{ width: 24, height: 24, borderRadius: "50%" }}
-                title="English"
-              />
-            </ToggleButton>
-          </ToggleButtonGroup>
+          </Menu>
           {user && (
             <>
-              <IconButton onClick={handleAvatarClick} sx={{ ml: 2 }}>
-                <Avatar sx={{ bgcolor: "#1976d2", width: 32, height: 32 }}>
+              <IconButton onClick={(event) => setUserMenuAnchor(event.currentTarget)} aria-label={t("edit_user")}>
+                <Avatar sx={{ bgcolor: "primary.main", width: 36, height: 36, fontSize: "0.85rem", fontWeight: 800 }}>
                   {`${user.firstName?.[0] ?? "U"}${user.lastName?.[0] ?? "N"}`}
                 </Avatar>
               </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                transformOrigin={{ vertical: "top", horizontal: "right" }}
-              >
-                <MenuItem onClick={handleEditUser}>{t("edit_user")}</MenuItem>
-                <MenuItem onClick={handleLogoutClick}>{t("logout")}</MenuItem>
+              <Menu anchorEl={userMenuAnchor} open={Boolean(userMenuAnchor)} onClose={() => setUserMenuAnchor(null)}>
+                <MenuItem onClick={() => { navigate("/edit-user"); setUserMenuAnchor(null); }}>{t("edit_user")}</MenuItem>
+                <MenuItem onClick={handleLogout}>{t("logout")}</MenuItem>
               </Menu>
             </>
           )}

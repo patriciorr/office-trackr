@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
+import { surfaceColors } from "../themeColors";
 
 interface LoginProps {
   onLogin: (token: string, user: any) => void;
@@ -73,8 +74,8 @@ const Login: React.FC<LoginProps> = ({
           p: 3,
           boxShadow: 3,
           borderRadius: 2,
-          background: isDarkMode ? "#232946" : "#f4f4f4",
-          color: isDarkMode ? "#eaf0fa" : "#232946",
+          background: isDarkMode ? surfaceColors.dark.paper : surfaceColors.light.paper,
+          color: isDarkMode ? "#edf7f8" : "#183247",
         }}
       >
         <Typography variant="h5" sx={{ mb: 2, fontWeight: 700 }}>
