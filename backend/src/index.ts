@@ -1,34 +1,11 @@
 import dotenv from 'dotenv';
 import {logger} from './config/logger';
-import express from 'express';
 import mongoose from 'mongoose';
-import cors from 'cors';
 import {createServer} from 'http';
 import {initSocket} from './sockets';
-import authRoutes from './routes/authRoutes';
-import userRoutes from './routes/userRoutes';
-import eventRoutes from './routes/eventRoutes';
-import {errorHandler} from './middleware/errorHandler';
+import app from './app';
 
 dotenv.config();
-
-const app = express();
-
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    credentials: true,
-  })
-);
-app.use(express.json());
-
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/events', eventRoutes);
-
-// Global error handler (should be last)
-app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
