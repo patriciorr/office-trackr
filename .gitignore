@@ -27,3 +27,4 @@ dist-ssr
 .env
 
 backend/coverage
+frontend/coverage
