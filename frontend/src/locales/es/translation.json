@@ -99,7 +99,8 @@
   "previous_page": "página anterior",
   "next_page": "página siguiente",
   "last_page": "última página",
-  "admin_panel": "Panel de Administración"
-  ,"open_navigation": "Abrir navegación"
-  ,"change_language": "Cambiar idioma"
+  "admin_panel": "Panel de Administración",
+  "open_navigation": "Abrir navegación",
+  "change_language": "Cambiar idioma",
+  "footer_message": "Hecho con ❤️ por Patricio Rodríguez"
 }

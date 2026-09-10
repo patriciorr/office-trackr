@@ -99,7 +99,8 @@
   "previous_page": "previous page",
   "next_page": "next page",
   "last_page": "last page",
-  "admin_panel": "Admin Dashboard"
-  ,"open_navigation": "Open navigation"
-  ,"change_language": "Change language"
+  "admin_panel": "Admin Dashboard",
+  "open_navigation": "Open navigation",
+  "change_language": "Change language",
+  "footer_message": "Made with ❤️ by Patricio Rodríguez"
 }

@@ -28,10 +28,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import esLocale from "./locales/es/muiLocaleEs";
 import enLocale from "./locales/en/muiLocaleEn";
+import frLocale from "./locales/fr/muiLocaleFr";
+import ptLocale from "./locales/pt/muiLocalePt";
 import { muiLocales } from "./locales/muiLocales";
 import { useTranslation } from "react-i18next";
 import "./App.css";
 import { surfaceColors } from "./themeColors";
+import Footer from "./components/Footer";
 
 interface WorkerSummary {
   userId: string;
@@ -46,8 +49,8 @@ const App: React.FC = () => {
   const role = user?.role || "coworker";
   const { t, i18n } = useTranslation();
   const isSmallScreen = useMediaQuery("(max-width:899px)");
-  const [language, setLanguage] = useState<"es" | "en">(() => {
-    return (localStorage.getItem("language") as "es" | "en") || "es";
+  const [language, setLanguage] = useState<"es" | "en" | "fr" | "pt">(() => {
+    return (localStorage.getItem("language") as "es" | "en" | "fr" | "pt") || "es";
   });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const stored = localStorage.getItem("isDarkMode");
@@ -353,6 +356,7 @@ const App: React.FC = () => {
                 >
                   {t("already_have_account")}
                 </Button>
+                <Footer isDarkMode={isDarkMode} language={language} />
               </>
             ) : (
               <>
@@ -373,6 +377,7 @@ const App: React.FC = () => {
                 >
                   {t("no_account")}
                 </Button>
+                <Footer isDarkMode={isDarkMode} language={language} />
               </>
             )}
           </Container>
@@ -402,7 +407,7 @@ const App: React.FC = () => {
           activeTab={activeTab}
           onLogout={handleLogout}
           language={language}
-          onLanguageChange={(lang: "es" | "en") => {
+          onLanguageChange={(lang: "es" | "en" | "fr" | "pt") => {
             setLanguage(lang);
             i18n.changeLanguage(lang);
           }}
@@ -413,7 +418,7 @@ const App: React.FC = () => {
             element={
               <LocalizationProvider
                 dateAdapter={AdapterDateFns}
-                adapterLocale={language === "es" ? esLocale : enLocale}
+                adapterLocale={language === "en" ? enLocale : language === "fr" ? frLocale : language === "pt" ? ptLocale : esLocale}
               >
                 <>
                   <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -517,6 +522,10 @@ const App: React.FC = () => {
             }
           />
         </Routes>
+        <Footer
+          isDarkMode={isDarkMode}
+          language={language}
+        />
         <Snackbar
           open={!!feedback}
           autoHideDuration={4000}

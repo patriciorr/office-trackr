@@ -14,8 +14,8 @@ import { surfaceColors } from "../themeColors";
 
 interface RegisterProps {
   onRegister: (token: string, user: any) => void;
-  language: "es" | "en";
-  onLanguageChange: (lang: "es" | "en") => void;
+  language: "es" | "en" | "fr" | "pt";
+  onLanguageChange: (lang: "es" | "en" | "fr" | "pt") => void;
   isDarkMode?: boolean;
   onToggleDarkMode: () => void;
 }

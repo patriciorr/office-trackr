@@ -23,7 +23,7 @@ import logoLight from "../assets/office-trackr-logo-light.svg";
 import logoDark from "../assets/office-trackr-logo-dark.svg";
 import TranslateIcon from "@mui/icons-material/Translate";
 
-type LanguageCode = "es" | "en";
+type LanguageCode = "es" | "en" | "fr" | "pt";
 
 const languageOptions: Array<{
   code: LanguageCode;
@@ -32,6 +32,8 @@ const languageOptions: Array<{
 }> = [
   { code: "es", label: "Español", countryCode: "ES" },
   { code: "en", label: "English", countryCode: "GB" },
+  { code: "fr", label: "Français", countryCode: "FR" },
+  { code: "pt", label: "Português", countryCode: "PT" }
 ];
 
 interface NavbarProps {
