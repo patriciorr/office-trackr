@@ -34,7 +34,7 @@
 - 🔑 **Secure Authentication:** JWT token authentication with bcrypt password hashing.
 - 📊 **Manager Insights Dashboard:** Real-time visibility into team availability and office density.
 - ⚡ **RESTful API Architecture:** Scalable Node.js + Express backend integrated with MongoDB.
-- 🐳 **Docker-Ready Workflow:** Rapid setup for database initialization and local environment deployment.
+- 🐳 **Full-Stack Docker Orchestration:** Complete multi-container setup (Nginx Frontend, NodeJS Backend, Mongo Database) managed via Docker Compose.
 
 ---
 
@@ -45,7 +45,8 @@
 | :--- | :--- | :--- |
 | **React** | ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) | Dynamic Single Page Application (SPA) |
 | **Vite** | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) | Ultra-fast build tool and dev server |
-| **JavaScript / JSX** | ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) | Modern ES6+ application logic |
+| **Material UI (MUI)** | ![MUI](https://img.shields.io/badge/MUI-007FFF?style=for-the-badge&logo=mui&logoColor=white) | Elegant UI component system and styling |
+| **Nginx** | ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white) | Reverse proxy & static content web server |
 
 ### Backend & Database
 | Technology | Badge | Purpose |
@@ -54,22 +55,25 @@
 | **Express** | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white) | RESTful API backend framework |
 | **MongoDB** | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white) | NoSQL document database |
 | **JWT** | ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white) | Token-based session management |
-| **Docker** | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) | Containerized database environment |
+| **Docker** | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) | Multi-container environment orchestration |
 
 ---
 
 ## 📁 Project Structure
 
 ```text
-officetrackr/
+office-trackr/
 ├── 📂 frontend/            # React + Vite client app
 │   ├── 📂 src/             # Components, pages, context, and styles
 |   ├── 📂 test/            # Unit, integration and e2e tests
+│   ├── 📄 Dockerfile       # Frontend container image definition
 │   ├── 📄 package.json     # Client dependencies
+│   ├── 📄 nginx.conf       # Nginx reverse proxy routing
 │   └── 📄 vite.config.js   # Vite configuration
 ├── 📂 backend/             # Node.js + Express REST API
 │   ├── 📂 src/             # Controllers, models, routes, middleware
 |   ├── 📂 test/            # Unit, integration and e2e tests
+│   ├── 📄 Dockerfile       # Backend container image definition
 │   ├── 📄 .env             # Environment configuration (git-ignored)
 │   └── 📄 package.json     # Server dependencies
 ├── 📄 mongo-init.js        # MongoDB seed data script
@@ -86,7 +90,35 @@ officetrackr/
 Ensure you have the following installed on your system:
 - **Node.js**: `v18.0.0` or higher
 - **npm**: `v9.0.0` or higher
-- **Docker Desktop**: (for running MongoDB locally)
+- **Docker Desktop** / **Docker Engine**: `v24.0+`
+- **Docker Compose**: `v2.20+`
+
+---
+
+### 🐳 Quick Start with Docker Compose (Recommended)
+
+Launch the entire stack (Nginx, React, NodeJS and MongoDB) with a single command:
+
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/patriciorr/office-trackr.git
+cd office-trackr
+```
+
+#### 2. Start the Containers
+```bash
+docker compose up -d --build
+```
+
+#### 3. Access the Platform
+- **Web Application:** `http://localhost`
+- **REST API:** `http://localhost:5000`
+- **MongoDB:** `http://localhost:27017`
+
+#### 4. Stop the Containers
+```bash
+docker compose down
+```
 
 ---
 
@@ -95,7 +127,7 @@ Ensure you have the following installed on your system:
 #### 1. Clone the Repository
 ```bash
 git clone https://github.com/patriciorr/office-trackr.git
-cd officetrackr
+cd office-trackr
 ```
 
 #### 2. Start Database (Docker)
@@ -147,16 +179,6 @@ npm run dev
 ```
 
 Access the app at `http://localhost:3000` and the API at `http://localhost:5000`.
-
----
-
-### 🐳 Option 2: Docker Compose Setup (To Be Improved)
-
-If you have a `docker-compose.yml` file configured, you can launch the full stack in one step:
-
-```bash
-docker-compose up -d --build
-```
 
 ---
 

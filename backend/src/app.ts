@@ -7,11 +7,14 @@ import {errorHandler} from './middleware/errorHandler';
 
 const app = express();
 
+const origins = ['http://localhost', 'http://localhost:80', 'http://localhost:3000', 'http://127.0.0.1:3000'];
+
 app.use(
   cors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    origin: origins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'],
   })
 );
 app.use(express.json());
