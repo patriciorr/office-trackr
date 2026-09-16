@@ -8,8 +8,16 @@ sleep 1
 
 docker stop $(docker ps -a -q)
 docker rm $(docker ps -a -q)
-docker pull mongo:8.0.5
-docker run -d -p 27017:27017 --name office-trackr-mongo mongo:8.0.5
+docker run -d \
+  --name office-trackr-mongo \
+  --restart always \
+  -e MONGO_INITDB_ROOT_USERNAME=root \
+  -e MONGO_INITDB_ROOT_PASSWORD=example \
+  -e MONGO_INITDB_DATABASE=office-trackr \
+  -p 27017:27017 \
+  -v mongo_data:/data/db \
+  -v "$(pwd)/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro" \
+  mongo:7
 
 cleanup() {
   echo "Closing processes..."

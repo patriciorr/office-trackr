@@ -9,12 +9,12 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "test:unit": "vitest run --config vitest.unit.config.ts --coverage",
     "test:unit:watch": "vitest --config vitest.unit.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts --coverage",
     "test:e2e": "bash test/e2e/run-e2e.sh",
-    "test:e2e:open": "cypress open",
-    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e"
+    "test:e2e:open": "cypress open"
   },
   "dependencies": {
     "@date-io/date-fns": "^3.2.1",

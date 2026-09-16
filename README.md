@@ -4,13 +4,13 @@
 
 **A modern, full-stack hybrid workplace & event management platform.**
 
-[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg?logo=creative-commons&logoColor=white)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 [![Node.js](https://img.shields.io/badge/Node.js-v18%2B-green?logo=nodedotjs)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18.x-blue?logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite)](https://vitejs.dev/)
 [![Express](https://img.shields.io/badge/Express-4.x-black?logo=express)](https://expressjs.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?logo=mongodb)](https://www.mongodb.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
+[![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-lightgrey?logo=data:image/svg%2bxml;base64,PHN2ZyB3aWR0aD0iMTk3cHgiIGhlaWdodD0iMTk3cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmVyc2lvbj0iMS4xIj4KCTxjaXJjbGUgY3g9Ijk4IiBjeT0iOTgiIHI9Ijk4IiBmaWxsPSJibGFjayIvPgoJPGNpcmNsZSBjeD0iOTgiIGN5PSI5OCIgcj0iNzgiIGZpbGw9IndoaXRlIi8+Cgk8Y2lyY2xlIGN4PSI5OCIgY3k9Ijk4IiByPSI1NSIgZmlsbD0iYmxhY2siLz4KCTxjaXJjbGUgY3g9Ijk4IiBjeT0iOTgiIHI9IjMwIiBmaWxsPSJ3aGl0ZSIvPgoJPHJlY3QgeD0iMTE1IiB5PSI4NSIgd2lkdGg9IjQ1IiBoZWlnaHQ9IjI1IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4=)](./LICENSE)
 
 [Key Features](#-key-features) • [Tech Stack](#-tech-stack) • [Project Structure](#-project-structure) • [Getting Started](#-getting-started) • [Test Credentials](#-test-credentials) • [License](#-license--usage-restrictions)
 
@@ -41,21 +41,23 @@
 ## 🛠️ Tech Stack
 
 ### Frontend
-| Technology | Badge | Purpose |
-| :--- | :--- | :--- |
-| **React** | ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) | Dynamic Single Page Application (SPA) |
-| **Vite** | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) | Ultra-fast build tool and dev server |
-| **Material UI (MUI)** | ![MUI](https://img.shields.io/badge/MUI-007FFF?style=for-the-badge&logo=mui&logoColor=white) | Elegant UI component system and styling |
-| **Nginx** | ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white) | Reverse proxy & static content web server |
+
+| Technology            | Badge                                                                                               | Purpose                                   |
+| :-------------------- | :-------------------------------------------------------------------------------------------------- | :---------------------------------------- |
+| **React**             | ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) | Dynamic Single Page Application (SPA)     |
+| **Vite**              | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)     | Ultra-fast build tool and dev server      |
+| **Material UI (MUI)** | ![MUI](https://img.shields.io/badge/MUI-007FFF?style=for-the-badge&logo=mui&logoColor=white)        | Elegant UI component system and styling   |
+| **Nginx**             | ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)  | Reverse proxy & static content web server |
 
 ### Backend & Database
-| Technology | Badge | Purpose |
-| :--- | :--- | :--- |
-| **Node.js** | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white) | JavaScript runtime engine |
-| **Express** | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white) | RESTful API backend framework |
-| **MongoDB** | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white) | NoSQL document database |
-| **JWT** | ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white) | Token-based session management |
-| **Docker** | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) | Multi-container environment orchestration |
+
+| Technology  | Badge                                                                                                          | Purpose                                   |
+| :---------- | :------------------------------------------------------------------------------------------------------------- | :---------------------------------------- |
+| **Node.js** | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)     | JavaScript runtime engine                 |
+| **Express** | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white) | RESTful API backend framework             |
+| **MongoDB** | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)       | NoSQL document database                   |
+| **JWT**     | ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)   | Token-based session management            |
+| **Docker**  | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)          | Multi-container environment orchestration |
 
 ---
 
@@ -88,6 +90,7 @@ office-trackr/
 ### Prerequisites
 
 Ensure you have the following installed on your system:
+
 - **Node.js**: `v18.0.0` or higher
 - **npm**: `v9.0.0` or higher
 - **Docker Desktop** / **Docker Engine**: `v24.0+`
@@ -100,22 +103,26 @@ Ensure you have the following installed on your system:
 Launch the entire stack (Nginx, React, NodeJS and MongoDB) with a single command:
 
 #### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/patriciorr/office-trackr.git
 cd office-trackr
 ```
 
 #### 2. Start the Containers
+
 ```bash
 docker compose up -d --build
 ```
 
 #### 3. Access the Platform
+
 - **Web Application:** `http://localhost`
 - **REST API:** `http://localhost:5000`
 - **MongoDB:** `http://localhost:27017`
 
 #### 4. Stop the Containers
+
 ```bash
 docker compose down
 ```
@@ -124,13 +131,23 @@ docker compose down
 
 ### 💻 Local Development Setup
 
+Run the script `start-dev.sh` once you clone the repository to start the development server
+
+```bash
+sh start-dev.sh
+```
+
+If not, you can follow these steps
+
 #### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/patriciorr/office-trackr.git
 cd office-trackr
 ```
 
 #### 2. Start Database (Docker)
+
 Run the following command to launch a pre-populated **MongoDB 7** container:
 
 ```bash
@@ -146,15 +163,18 @@ docker run -d \
   mongo:7
 ```
 
-> **MongoDB Connection URI:**
+> [!NOTE]
+> This is the MongoDB connection URL
 > `mongodb://officetrackruser:officetrackrpass@localhost:27017/office-trackr?authSource=office-trackr`
 
-*To clean up and remove the Docker container & volume:*
+_To clean up and remove the Docker container & volume:_
+
 ```bash
 docker rm -f -v office-trackr-mongo && docker volume rm mongo_data
 ```
 
 #### 3. Configure Environment Variables
+
 Create a `.env` file inside the `backend` folder:
 
 ```env
@@ -164,6 +184,7 @@ JWT_SECRET=your_jwt_secret_key_here
 ```
 
 #### 4. Run Backend
+
 ```bash
 cd backend
 npm install
@@ -171,14 +192,16 @@ npm run dev
 ```
 
 #### 5. Run Frontend
+
 In a new terminal window:
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Access the app at `http://localhost:3000` and the API at `http://localhost:5000`.
+Access the app at `http://localhost:5173` and the API at `http://localhost:5000`.
 
 ---
 
@@ -186,12 +209,12 @@ Access the app at `http://localhost:3000` and the API at `http://localhost:5000`
 
 The database initializes with demo user accounts to test each role:
 
-| Role | Email | Password | Access Level |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin@test.com` | `Patricio@123` | Full administrative control |
-| **Manager** | `manager@test.com` | `Patricio@123` | Team calendar & dashboard metrics |
-| **Coworker** | `johndoe@test.com` | `Patricio@123` | Personal schedule logging |
-| **Coworker** | `janedoe@test.com` | `Patricio@123` | Personal schedule logging |
+| Role         | Email              | Password       | Access Level                      |
+| :----------- | :----------------- | :------------- | :-------------------------------- |
+| **Admin**    | `admin@test.com`   | `Patricio@123` | Full administrative control       |
+| **Manager**  | `manager@test.com` | `Patricio@123` | Team calendar & dashboard metrics |
+| **Coworker** | `johndoe@test.com` | `Patricio@123` | Personal schedule logging         |
+| **Coworker** | `janedoe@test.com` | `Patricio@123` | Personal schedule logging         |
 
 ---
 
@@ -207,20 +230,22 @@ The database initializes with demo user accounts to test each role:
 
 <div align="center">
 
-[![CC BY-NC-ND 4.0](https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-nc-nd.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
+Copyright (c) 2026 Patricio Rodríguez Ramírez. All rights reserved.
 
 </div>
 
-This project is licensed under the **Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)** License.
+**1. PROPRIETARY RIGHTS & RESTRICTIONS**
+This source code and its associated files are the exclusive property of Patricio Rodríguez Ramírez. Unauthorized copying, modification, distribution, sublicensing, or commercial/non-commercial use of this software, via any medium, is strictly prohibited without explicit written permission from the copyright owner, except as permitted under the GitHub Terms of Service.
 
-### Summary of Terms:
-- 🚫 **Non-Commercial:** You may not use this software, source code, design, or concept for commercial purposes.
-- 🚫 **No Derivatives:** You may not alter, transform, build upon, or distribute modified versions of this software.
-- 👁️ **Attribution:** You are free to view, download, and test this project for personal evaluation or educational purposes, provided appropriate credit is given to the author.
+**2. CONTRIBUTIONS AND PULL REQUESTS**
+By submitting any contribution to this repository (including but not limited to pull requests, patches, bug fixes, suggestions, or code modifications), you hereby grant Patricio Rodríguez Ramírez a perpetual, irrevocable, worldwide, non-exclusive, royalty-free, fully paid-up, transferable, and sublicensable license to use, reproduce, modify, adapt, publish, perform, display, distribute, sell, offer for sale, import, and commercialize such contributions under any terms or licenses, present or future.
+You represent and warrant that you are the sole author of the contribution or possess all necessary legal rights and authority to grant the rights and licenses specified herein.
 
-For full license terms and legal code, visit the [Creative Commons CC BY-NC-ND 4.0 License Portal](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+**3. DISCLAIMER OF WARRANTY**
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ---
+
 <div align="center">
   <sub>Built with ❤️ by Patricio Rodríguez.</sub>
 </div>

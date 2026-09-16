@@ -1,0 +1,38 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: office-trackr-mongo-e2e
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: office-trackr
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    container_name: office-trackr-backend-e2e
+    environment:
+      - MONGO_URI=mongodb://root:example@mongo:27017/office-trackr?authSource=admin
+      - JWT_SECRET=e2e-cypress-secret
+      - PORT=5000
+    ports:
+      - '5000:5000'
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: office-trackr-frontend-e2e
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend

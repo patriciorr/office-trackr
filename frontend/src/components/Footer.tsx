@@ -1,41 +1,14 @@
 import Box from "@mui/material/Box";
 import { useTranslation } from "react-i18next";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
-import InputLabel from "@mui/material/InputLabel";
-import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import EmailIcon from "@mui/icons-material/Email";
 
-interface FooterProps {
-  isDarkMode: boolean;
-  language: string;
-  minimal?: boolean;
-}
-
-function Copyright() {
-  return (
-    <Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
-      {"Copyright © "}
-      <Link
-        href="https://patriciorr.github.io/" //TODO: complete when personal website is ready
-        sx={{
-          color: "text.secondary",
-        }}
-      >
-        Patricio Rodríguez
-      </Link>
-      {new Date().getFullYear()}
-    </Typography>
-  );
-}
-
-const Footer: React.FC<FooterProps> = ({ isDarkMode, language, minimal }) => {
+const Footer: React.FC = () => {
   const { t } = useTranslation();
   return (
     <Box
@@ -56,19 +29,6 @@ const Footer: React.FC<FooterProps> = ({ isDarkMode, language, minimal }) => {
           textAlign: { sm: "center", md: "left" },
         }}
       >
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: "medium",
-            color: "text.secondary",
-            cursor: "default",
-            whiteSpace: "nowrap",
-            fontSize: "body2.fontSize",
-          }}
-        >
-          {t("footer_message")}
-        </Typography>
-
         <Stack
           direction="row"
           spacing={1}
@@ -103,6 +63,30 @@ const Footer: React.FC<FooterProps> = ({ isDarkMode, language, minimal }) => {
             <LinkedInIcon />
           </IconButton>
         </Stack>
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: "medium",
+            color: "text.secondary",
+            cursor: "default",
+            whiteSpace: "nowrap",
+            fontSize: "body2.fontSize",
+          }}
+        >
+          {t("footer_message") + " Patricio Rodríguez Ramírez"}
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: "medium",
+            color: "text.secondary",
+            cursor: "default",
+            whiteSpace: "nowrap",
+            fontSize: "body2.fontSize.small",
+          }}
+        >
+          {"Copyright © " + new Date().getFullYear() + ". All rights reserved."}
+        </Typography>
       </Container>
     </Box>
   );
