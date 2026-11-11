@@ -33,7 +33,7 @@ describe('ManagerDashboard', () => {
     renderWithProviders(<ManagerDashboard />, {user: manager});
 
     await waitFor(() => expect(screen.getByText('Alice Anderson')).toBeInTheDocument());
-    expect(screen.getByText(/Días de oficina:\s*2/)).toBeInTheDocument();
+    expect(await screen.findByText(/Días de oficina:\s*2/)).toBeInTheDocument();
     expect(screen.getByText(/Días de vacaciones:\s*1/)).toBeInTheDocument();
   });
 
