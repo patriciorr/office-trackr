@@ -248,7 +248,8 @@ Develop on `develop` (or merge feature branches into it), then open a pull reque
 The GitHub Actions CI workflow builds both applications and runs the backend unit, integration and E2E tests, frontend
 unit and integration tests, and Cypress against an isolated Docker stack. Protect `main` with a pull-request rule and
 require the `Backend`, `Frontend`, and `Cypress` checks before merging. Railway deploys `main` automatically after
-the merge. The repository's existing review and code-owner requirements also apply.
+the merge. As this is a single-maintainer repository, pull requests do not require a separate approval. The existing
+CODEOWNERS assignment and signed-commit requirement remain in place.
 
 Run the same suites locally with `npm test` in `backend`, and `npm test` in `frontend`. Docker is required for the
 backend integration and E2E tests and for Cypress. The Cypress runner uses its own Compose project and a dynamically
