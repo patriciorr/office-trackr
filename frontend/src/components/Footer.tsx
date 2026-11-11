@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import { useTranslation } from "react-i18next";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
+import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import GitHubIcon from "@mui/icons-material/GitHub";
@@ -81,11 +82,17 @@ const Footer: React.FC = () => {
             fontWeight: "medium",
             color: "text.secondary",
             cursor: "default",
-            whiteSpace: "nowrap",
             fontSize: "body2.fontSize.small",
           }}
         >
-          {"Copyright © " + new Date().getFullYear() + ". All rights reserved."}
+          {"Copyright © " + new Date().getFullYear() + " · "}
+          <Link color="inherit" href="https://github.com/patriciorr/office-trackr/blob/main/LICENSE">
+            AGPL-3.0
+          </Link>
+          {" · "}
+          <Link color="inherit" href="https://github.com/patriciorr/office-trackr">
+            {t("source_code")}
+          </Link>
         </Typography>
       </Container>
     </Box>
