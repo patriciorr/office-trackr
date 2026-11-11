@@ -1,6 +1,7 @@
 import {describe, expect, it} from '@jest/globals';
 import request from 'supertest';
 import app from '../../../src/app';
+import UserService from '../../../src/services/userService';
 
 describe('UserController (e2e)', () => {
   const buildUser = (overrides: Partial<Record<string, unknown>> = {}) => ({
@@ -36,6 +37,12 @@ describe('UserController (e2e)', () => {
       expect(response.status).toBe(400);
       expect(response.body).toEqual({error: 'EM003 - Email is already registered'});
     });
+
+    it('does not create an administrator through public registration', async () => {
+      const admin = buildUser({role: 'admin'});
+      await createUser(admin).expect(400);
+      await login(admin.email, admin.password).expect(401);
+    });
   });
 
   describe('GET /api/users', () => {
@@ -53,7 +60,7 @@ describe('UserController (e2e)', () => {
 
     it('lists users for an admin, applying query filters', async () => {
       const admin = buildUser({role: 'admin'});
-      await createUser(admin).expect(201);
+      await new UserService().createUser({...admin, role: 'admin'});
       const {body: adminAuth} = await login(admin.email, admin.password);
 
       const target = buildUser();
@@ -165,7 +172,7 @@ describe('UserController (e2e)', () => {
 
     it('allows an admin to delete a user', async () => {
       const admin = buildUser({role: 'admin'});
-      await createUser(admin).expect(201);
+      await new UserService().createUser({...admin, role: 'admin'});
       const {body: adminAuth} = await login(admin.email, admin.password);
 
       const target = buildUser();

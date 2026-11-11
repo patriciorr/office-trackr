@@ -23,4 +23,17 @@ describe('registration configuration', () => {
     });
     await request(app).post('/api/users').send({email: 'test@example.com'}).expect(201);
   });
+
+  it.each(['coworker', 'manager'])('allows public registration as %s', async role => {
+    jest.mocked(UserService.prototype.createUser).mockResolvedValue({
+      id: '1', email: 'test@example.com', firstName: 'Demo', lastName: 'User', role,
+    });
+    await request(app).post('/api/users').send({email: 'test@example.com', role}).expect(201);
+    expect(UserService.prototype.createUser).toHaveBeenCalledWith(expect.objectContaining({role}));
+  });
+
+  it.each(['admin', 'other', null, {value: 'admin'}])('rejects disallowed registration role %p', async role => {
+    await request(app).post('/api/users').send({email: 'test@example.com', role}).expect(400);
+    expect(UserService.prototype.createUser).not.toHaveBeenCalled();
+  });
 });

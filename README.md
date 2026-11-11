@@ -240,6 +240,17 @@ Railway's private network and MongoDB template are documented at
 [Private Networking](https://docs.railway.com/networking/private-networking) and
 [MongoDB](https://docs.railway.com/databases/mongodb).
 
+### Enable public registration
+
+Deploy the backend version that restricts public registration roles before enabling registration. Remove the bootstrap
+variables after the initial accounts are created, then set `DISABLE_REGISTRATION=false` (or remove it) in the backend
+service and deploy the change. Set `VITE_DISABLE_REGISTRATION=false` (or remove it) in the frontend service and rebuild
+it to show the registration link. Apply the staged changes in Railway.
+
+Registrants may choose `coworker` or `manager`; public registration cannot create an `admin`. Managers can list user
+accounts and manage their team, so enable public registration only if those permissions are appropriate for everyone who
+can sign up. Keep MongoDB and the backend private, and review security, backups, and monitoring before using real data.
+
 ---
 
 ## CI and release workflow
