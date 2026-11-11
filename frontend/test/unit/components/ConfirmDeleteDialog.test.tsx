@@ -37,7 +37,7 @@ describe('ConfirmDeleteDialog', () => {
     await waitFor(() => expect(onDeleted).toHaveBeenCalledTimes(1));
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/users/user-1',
+      '/api/users/user-1',
       expect.objectContaining({method: 'DELETE', headers: {Authorization: 'Bearer test-token'}})
     );
   });

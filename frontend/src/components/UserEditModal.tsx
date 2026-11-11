@@ -39,7 +39,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
     setError(null);
     try {
       const body: any = { firstName, lastName };
-      const res = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+      const res = await fetch(`/api/users/${user.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

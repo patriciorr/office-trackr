@@ -61,7 +61,7 @@ const Register: React.FC<RegisterProps> = ({
     setSuccess("");
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/users/", {
+      const res = await fetch("/api/users/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -75,7 +75,7 @@ const Register: React.FC<RegisterProps> = ({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t("register_failed"));
 
-      const loginRes = await fetch("http://localhost:5000/api/auth/login", {
+      const loginRes = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

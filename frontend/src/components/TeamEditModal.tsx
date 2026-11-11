@@ -46,7 +46,7 @@ const TeamEditModal: React.FC<TeamEditModalProps> = ({
 
   useEffect(() => {
     setFetching(true);
-    fetch("http://localhost:5000/api/users?roles=coworker", {
+    fetch("/api/users?roles=coworker", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -65,7 +65,7 @@ const TeamEditModal: React.FC<TeamEditModalProps> = ({
     setError(null);
     try {
       const newTeam = selected.map((c) => c.id);
-      const res = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+      const res = await fetch(`/api/users/${user.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

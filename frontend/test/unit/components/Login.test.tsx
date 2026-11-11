@@ -29,7 +29,7 @@ describe('Login', () => {
 
     await waitFor(() => expect(onLogin).toHaveBeenCalledWith('jwt-token', {id: 'user-1', role: 'coworker'}));
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/auth/login',
+      '/api/auth/login',
       expect.objectContaining({method: 'POST'})
     );
   });

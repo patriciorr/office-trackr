@@ -45,7 +45,7 @@ describe('TeamEditModal', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenNthCalledWith(
       2,
-      'http://localhost:5000/api/users/manager-1',
+      '/api/users/manager-1',
       expect.objectContaining({method: 'PATCH', body: JSON.stringify({team: ['coworker-1']})})
     );
   });

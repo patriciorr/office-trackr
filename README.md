@@ -205,6 +205,58 @@ Access the app at `http://localhost:5173` and the API at `http://localhost:5000`
 
 ---
 
+## Railway temporary deployment
+
+This setup is intended for a short demonstration with fictional data, not production. Use a Railway project with
+three services in the same environment: `frontend`, `backend`, and MongoDB. Only the frontend should have a public
+domain. Railway charges for resource use; monitor the available trial or Free credits.
+
+1. Connect the repository and `main` in Railway. Add the Railway MongoDB template, keep public access disabled,
+   and confirm that its volume is mounted at `/data/db`. MongoDB must use a persistent volume to survive redeployments.
+2. Add a backend service from the repository with root directory `/backend` and its Dockerfile. Configure:
+   - `MONGO_URI`: reference the MongoDB service's private `MONGO_URL` variable.
+   - `MONGO_DB_NAME`: `office-trackr`.
+   - `JWT_SECRET`: a new, long random secret.
+   - `PORT`: `5000`.
+   - `NODE_ENV`: `production`.
+   - `DISABLE_REGISTRATION`: `true`.
+   Do not assign a public domain or TCP proxy to this service.
+3. To initialize the two accounts on the first startup, temporarily set `BOOTSTRAP_USERS=true` and set
+   `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD`, `BOOTSTRAP_COWORKER_EMAIL`, and
+   `BOOTSTRAP_COWORKER_PASSWORD` in the backend service. Use different email addresses and unique passwords that satisfy
+   the application's password validation. The bootstrap requires registration to be disabled and never overwrites an
+   existing account; an existing account with an unexpected role stops startup. Remove all five bootstrap variables
+   after confirming both accounts can log in. Never commit the credentials or use the local Docker demo accounts.
+4. Add a frontend service with root directory `/frontend` and its Dockerfile. Set `VITE_DISABLE_REGISTRATION=true`
+   for the build, `BACKEND_HOST` to a Railway variable reference to the backend's `RAILWAY_PRIVATE_DOMAIN`, and
+   `BACKEND_PORT=5000`. Create a Railway public domain targeting port `80`. The Nginx proxy forwards `/api/` and
+   `/socket.io/` over the private network; it resolves the backend hostname again after deployments.
+5. Enable automatic deployment from `main`. Verify both logins, calendar operations, disabled registration,
+   role restrictions, and persistence after restarting MongoDB. Check service logs and the Railway usage dashboard.
+6. When the demonstration is finished, stop the deployments. Delete the volume and services only when the test data is
+   no longer needed.
+
+Railway's private network and MongoDB template are documented at
+[Private Networking](https://docs.railway.com/networking/private-networking) and
+[MongoDB](https://docs.railway.com/databases/mongodb).
+
+---
+
+## CI and release workflow
+
+Develop on `develop` (or merge feature branches into it), then open a pull request from `develop` to `main`.
+The GitHub Actions CI workflow builds both applications and runs the backend unit, integration and E2E tests, frontend
+unit and integration tests, and Cypress against an isolated Docker stack. Protect `main` with a pull-request rule and
+require the `Backend`, `Frontend`, and `Cypress` checks before merging. Railway deploys `main` automatically after
+the merge. As this is a single-maintainer repository, pull requests do not require a separate approval or signed
+commits. The existing CODEOWNERS assignment remains in place.
+
+Run the same suites locally with `npm test` in `backend`, and `npm test` in `frontend`. Docker is required for the
+backend integration and E2E tests and for Cypress. The Cypress runner uses its own Compose project and a dynamically
+assigned localhost port.
+
+---
+
 ## 🔑 Test Credentials
 
 The database initializes with demo user accounts to test each role:

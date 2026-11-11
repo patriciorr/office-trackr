@@ -11,7 +11,7 @@ declare global {
 }
 
 Cypress.Commands.add('loginByApi', (email: string, password: string) => {
-  cy.request('POST', 'http://localhost:5000/api/auth/login', {email, password}).then(({body}) => {
+  cy.request('POST', '/api/auth/login', {email, password}).then(({body}) => {
     window.localStorage.setItem('token', body.token);
     window.localStorage.setItem('user', JSON.stringify(body.user));
   });

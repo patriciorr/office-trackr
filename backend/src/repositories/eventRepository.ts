@@ -33,17 +33,18 @@ export default class EventRepository {
     return events.map(this.toEventDTO);
   }
 
-  async updateEventById(id: string, update: Partial<IEvent>) {
+  async updateEventById(id: string, userId: string, update: Partial<IEvent>) {
     logger.info(`EventRepository: updateEventById called for id: ${id}`);
-    const updatedEvent = await Event.findOneAndUpdate({id}, update, {
+    const updatedEvent = await Event.findOneAndUpdate({id, userId}, update, {
       new: true,
+      runValidators: true,
     });
     return updatedEvent ? this.toEventDTO(updatedEvent) : null;
   }
 
-  async deleteEventById(id: string) {
+  async deleteEventById(id: string, userId: string) {
     logger.info(`EventRepository: deleteEventById called for id: ${id}`);
-    return Event.findOneAndDelete({id});
+    return Event.findOneAndDelete({id, userId});
   }
 
   private toEventDTO(event: IEvent) {

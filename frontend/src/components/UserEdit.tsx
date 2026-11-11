@@ -56,7 +56,7 @@ const UserEdit: React.FC = () => {
     setPwSuccess(false);
     setPwLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${user?.id}`, {
+      const res = await fetch(`/api/users/${user?.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +116,7 @@ const UserEdit: React.FC = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${user?.id}`, {
+      const res = await fetch(`/api/users/${user?.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

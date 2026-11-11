@@ -72,6 +72,18 @@ export default class UserController {
       }
 
       const {oldPassword, newPassword, confirmPassword, ...rest} = req.body;
+      const allowedFields = ['firstName', 'lastName', 'email', 'role', 'team'];
+      if (Object.keys(rest).some(key => !allowedFields.includes(key))) {
+        logger.warn(`Invalid user update fields by user: ${authReq.user?.id}`);
+        return res.status(400).json({error: 'Invalid update fields'});
+      }
+      if (
+        authReq.user?.role !== 'admin' &&
+        ('role' in rest || ('team' in rest && authReq.user?.role !== 'manager'))
+      ) {
+        logger.warn(`Unauthorized role or team update by user: ${authReq.user?.id}`);
+        return res.status(403).json({error: 'Forbidden'});
+      }
       const user = await userService.updateUser(userId, rest, oldPassword, newPassword, confirmPassword);
 
       if (!user) {

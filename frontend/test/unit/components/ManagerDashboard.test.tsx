@@ -33,7 +33,7 @@ describe('ManagerDashboard', () => {
     renderWithProviders(<ManagerDashboard />, {user: manager});
 
     await waitFor(() => expect(screen.getByText('Alice Anderson')).toBeInTheDocument());
-    expect(screen.getByText(/Días de oficina:\s*2/)).toBeInTheDocument();
+    expect(await screen.findByText(/Días de oficina:\s*2/)).toBeInTheDocument();
     expect(screen.getByText(/Días de vacaciones:\s*1/)).toBeInTheDocument();
   });
 
@@ -72,7 +72,7 @@ describe('ManagerDashboard', () => {
 
     await waitFor(() => expect(setUser).toHaveBeenCalledWith({...manager, team: []}));
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:5000/api/users/manager-1',
+      '/api/users/manager-1',
       expect.objectContaining({method: 'PATCH', body: JSON.stringify({team: []})})
     );
   });

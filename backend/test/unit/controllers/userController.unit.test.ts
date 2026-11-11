@@ -1,4 +1,4 @@
-import {describe, expect, it, jest} from '@jest/globals';
+import {beforeEach, describe, expect, it, jest} from '@jest/globals';
 import UserController from '../../../src/controllers/userController';
 import UserService from '../../../src/services/userService';
 import {ValidationError} from '../../../src/utils/AppError';
@@ -14,6 +14,10 @@ const response = () => {
 };
 
 describe('userController', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('creates a user with a 201 response', async () => {
     const user = {id: 'user-1', email: 'user@example.com'};
     (UserService.prototype.createUser as any).mockResolvedValue(user);
@@ -125,6 +129,31 @@ describe('userController', () => {
 
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({error: 'Forbidden'});
+  });
+
+  it.each([{role: 'admin'}, {$set: {role: 'admin'}}, {team: ['user-2']}])(
+    'rejects privileged or unsupported fields in a coworker update',
+    async body => {
+      const res = response();
+      await UserController.updateUser(
+        {params: {id: 'user-1'}, body, user: {id: 'user-1', role: 'coworker'}} as any,
+        res
+      );
+      expect([400, 403]).toContain(res.status.mock.calls[0][0]);
+      expect(UserService.prototype.updateUser).not.toHaveBeenCalled();
+    }
+  );
+
+  it('allows a manager to update their team', async () => {
+    (UserService.prototype.updateUser as any).mockResolvedValue({id: 'manager-1'});
+    const res = response();
+    await UserController.updateUser(
+      {params: {id: 'manager-1'}, body: {team: ['user-2']}, user: {id: 'manager-1', role: 'manager'}} as any,
+      res
+    );
+    expect(UserService.prototype.updateUser).toHaveBeenCalledWith(
+      'manager-1', {team: ['user-2']}, undefined, undefined, undefined
+    );
   });
 
   it('returns 404 when an update finds no user', async () => {

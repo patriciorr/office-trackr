@@ -63,7 +63,7 @@ export default class EventController {
     try {
       logger.info(`Update event request for ID: ${req.params.id}`);
       const eventId = req.params.id;
-      const updated = await eventService.updateEvent(eventId, req.body);
+      const updated = await eventService.updateEvent(eventId, (req as AuthRequest).user.id, req.body);
       if (!updated) {
         logger.warn(`Event not found for ID: ${eventId}`);
         return res.status(404).json({error: 'Event not found'});
@@ -81,7 +81,7 @@ export default class EventController {
     try {
       logger.info(`Delete event request for ID: ${req.params.id}`);
       const eventId = req.params.id;
-      const deleted = await eventService.deleteEvent(eventId);
+      const deleted = await eventService.deleteEvent(eventId, (req as AuthRequest).user.id);
       if (!deleted) {
         logger.warn(`Event not found for ID: ${eventId}`);
         return res.status(404).json({error: 'Event not found'});

@@ -107,7 +107,7 @@ const App: React.FC = () => {
         year: calendarYear.toString(),
         month: (calendarMonth + 1).toString(),
       });
-      fetch(`http://localhost:5000/api/events?${params.toString()}`, {
+      fetch(`/api/events?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
       })
@@ -199,8 +199,8 @@ const App: React.FC = () => {
       const method = event.id ? "PUT" : "POST";
       const url =
         event.id
-          ? `http://localhost:5000/api/events/${event.id}`
-          : "http://localhost:5000/api/events";
+          ? `/api/events/${event.id}`
+          : "/api/events";
       const res = await fetch(url, {
         method,
         headers: {
@@ -221,7 +221,7 @@ const App: React.FC = () => {
         month: (calendarMonth + 1).toString(),
       });
       const updated = await fetch(
-        `http://localhost:5000/api/events?${params.toString()}`,
+        `/api/events?${params.toString()}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -247,7 +247,7 @@ const App: React.FC = () => {
         return;
       }
       const res = await fetch(
-        `http://localhost:5000/api/events/${eventToDelete.id}`,
+        `/api/events/${eventToDelete.id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -268,7 +268,7 @@ const App: React.FC = () => {
         month: (calendarMonth + 1).toString(),
       });
       const updated = await fetch(
-        `http://localhost:5000/api/events?${params.toString()}`,
+        `/api/events?${params.toString()}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           cache: "no-store",
@@ -370,13 +370,15 @@ const App: React.FC = () => {
                   isDarkMode={isDarkMode}
                   onToggleDarkMode={() => setIsDarkMode((v) => !v)}
                 />
-                <Button
-                  variant="text"
-                  onClick={() => setShowRegister(true)}
-                  sx={{ mt: 2 }}
-                >
-                  {t("no_account")}
-                </Button>
+                {import.meta.env.VITE_DISABLE_REGISTRATION !== "true" && (
+                  <Button
+                    variant="text"
+                    onClick={() => setShowRegister(true)}
+                    sx={{ mt: 2 }}
+                  >
+                    {t("no_account")}
+                  </Button>
+                )}
                 <Footer isDarkMode={isDarkMode} language={language} />
               </>
             )}

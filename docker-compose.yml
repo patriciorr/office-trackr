@@ -20,6 +20,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: office-trackr-backend
+    command: npm run dev
     environment:
       - MONGO_URI=mongodb://root:example@mongo:27017/office-trackr?authSource=admin
       - JWT_SECRET=supersecretkey

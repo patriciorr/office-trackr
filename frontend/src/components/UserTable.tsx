@@ -158,7 +158,7 @@ const UserTable: React.FC<UserTableProps> = ({
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:5000/api/users?roles=coworker,manager", {
+    fetch("/api/users?roles=coworker,manager", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

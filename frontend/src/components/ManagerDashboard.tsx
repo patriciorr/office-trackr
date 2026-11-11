@@ -139,7 +139,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 
   useEffect(() => {
     if (user!.role === "manager" && user?.team && user.team.length > 0) {
-      fetch(`http://localhost:5000/api/users?ids=${user.team.join(",")}`, {
+      fetch(`/api/users?ids=${user.team.join(",")}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -161,7 +161,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
       const month = selectedDate.getMonth() + 1; // JS: 0-indexed, API: 1-indexed
       coworkers.forEach((coworker) => {
         fetch(
-          `http://localhost:5000/api/events?userId=${coworker.id}&year=${year}&month=${month}`,
+          `/api/events?userId=${coworker.id}&year=${year}&month=${month}`,
           {
             method: "GET",
             headers: {
@@ -194,7 +194,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   }, [coworkers, selectedDate]);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/users?roles=coworker`, {
+    fetch(`/api/users?roles=coworker`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -210,7 +210,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
     setLoadingId(id);
     try {
       const newTeam = user!.team!.filter((uid) => uid !== id);
-      const res = await fetch(`http://localhost:5000/api/users/${user!.id}`, {
+      const res = await fetch(`/api/users/${user!.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -384,7 +384,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 try {
                   const newTeam = [...user?.team!, ...selectedCoworkers];
                   const res = await fetch(
-                    `http://localhost:5000/api/users/${user!.id}`,
+                    `/api/users/${user!.id}`,
                     {
                       method: "PATCH",
                       headers: {

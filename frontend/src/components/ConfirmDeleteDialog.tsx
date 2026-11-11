@@ -34,7 +34,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${user.id}`, {
+      const res = await fetch(`/api/users/${user.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
