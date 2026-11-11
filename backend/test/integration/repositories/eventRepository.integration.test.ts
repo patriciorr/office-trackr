@@ -69,13 +69,13 @@ describe('EventRepository (integration)', () => {
       const data = buildEvent();
       await repository.createEvent(data);
 
-      const updated = await repository.updateEventById(data.id, {type: 'vacation'});
+      const updated = await repository.updateEventById(data.id, data.userId, {type: 'vacation'});
 
       expect(updated?.type).toBe('vacation');
     });
 
     it('returns null when the event does not exist', async () => {
-      await expect(repository.updateEventById('missing-id', {type: 'vacation'})).resolves.toBeNull();
+      await expect(repository.updateEventById('missing-id', 'user-1', {type: 'vacation'})).resolves.toBeNull();
     });
   });
 
@@ -84,14 +84,22 @@ describe('EventRepository (integration)', () => {
       const data = buildEvent();
       await repository.createEvent(data);
 
-      const deleted: any = await repository.deleteEventById(data.id);
+      const deleted: any = await repository.deleteEventById(data.id, data.userId);
 
       expect(deleted?.id).toBe(data.id);
       await expect(Event.findOne({id: data.id})).resolves.toBeNull();
     });
 
     it('returns null when the event does not exist', async () => {
-      await expect(repository.deleteEventById('missing-id')).resolves.toBeNull();
+      await expect(repository.deleteEventById('missing-id', 'user-1')).resolves.toBeNull();
+    });
+
+    it('does not allow another user to update or delete an event', async () => {
+      const data = buildEvent();
+      await repository.createEvent(data);
+      await expect(repository.updateEventById(data.id, 'other-user', {type: 'vacation'})).resolves.toBeNull();
+      await expect(repository.deleteEventById(data.id, 'other-user')).resolves.toBeNull();
+      await expect(Event.findOne({id: data.id})).resolves.toMatchObject({type: 'office', userId: data.userId});
     });
   });
 });

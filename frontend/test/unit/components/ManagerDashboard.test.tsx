@@ -72,7 +72,7 @@ describe('ManagerDashboard', () => {
 
     await waitFor(() => expect(setUser).toHaveBeenCalledWith({...manager, team: []}));
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:5000/api/users/manager-1',
+      '/api/users/manager-1',
       expect.objectContaining({method: 'PATCH', body: JSON.stringify({team: []})})
     );
   });

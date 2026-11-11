@@ -104,6 +104,23 @@ describe('EventController (e2e)', () => {
   });
 
   describe('PUT /api/events/:id', () => {
+    it('does not let another user update or delete an event', async () => {
+      const ownerToken = await registerAndLogin();
+      const otherToken = await registerAndLogin();
+      const created = await request(app)
+        .post('/api/events')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({date: '2024-05-15', type: 'office'})
+        .expect(201);
+
+      await request(app).put(`/api/events/${created.body.id}`)
+        .set('Authorization', `Bearer ${otherToken}`).send({type: 'vacation'}).expect(404);
+      await request(app).delete(`/api/events/${created.body.id}`)
+        .set('Authorization', `Bearer ${otherToken}`).expect(404);
+      await request(app).get('/api/events').set('Authorization', `Bearer ${ownerToken}`)
+        .expect(200).expect(response => expect(response.body[0].type).toBe('office'));
+    });
+
     it('updates an existing event', async () => {
       const token = await registerAndLogin();
       const created = await request(app)

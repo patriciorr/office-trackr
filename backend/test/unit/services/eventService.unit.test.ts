@@ -37,7 +37,7 @@ describe('eventService', () => {
         id: 'event-1',
         type: 'vacation',
       });
-      expect(repository.prototype.updateEventById).toHaveBeenCalledWith('event-1', {type: 'vacation'});
+      expect(repository.prototype.updateEventById).toHaveBeenCalledWith('event-1', 'user-1', {type: 'vacation'});
       expect(repository.prototype.createEvent).not.toHaveBeenCalled();
     });
 
@@ -92,9 +92,9 @@ describe('eventService', () => {
     (repository.prototype.updateEventById as any).mockResolvedValue({id: 'event-1'});
     (repository.prototype.deleteEventById as any).mockResolvedValue({id: 'event-1'});
 
-    await expect(service.updateEvent('event-1', update)).resolves.toEqual({id: 'event-1'});
-    await expect(service.deleteEvent('event-1')).resolves.toEqual({id: 'event-1'});
-    expect(repository.prototype.updateEventById).toHaveBeenCalledWith('event-1', update);
-    expect(repository.prototype.deleteEventById).toHaveBeenCalledWith('event-1');
+    await expect(service.updateEvent('event-1', 'user-1', {...update, userId: 'other'})).resolves.toEqual({id: 'event-1'});
+    await expect(service.deleteEvent('event-1', 'user-1')).resolves.toEqual({id: 'event-1'});
+    expect(repository.prototype.updateEventById).toHaveBeenCalledWith('event-1', 'user-1', update);
+    expect(repository.prototype.deleteEventById).toHaveBeenCalledWith('event-1', 'user-1');
   });
 });

@@ -14,7 +14,7 @@ export default class EventService {
     const existing: IEvent | null = await this.eventRepository.findByUserAndDate(userId, date);
     if (existing) {
       logger.info(`EventService: updating existing event for user: ${userId}, date: ${date}`);
-      return this.eventRepository.updateEventById(existing.id, {
+      return this.eventRepository.updateEventById(existing.id, userId, {
         type,
       });
     }
@@ -36,14 +36,18 @@ export default class EventService {
   //   return this.eventRepository.findAll();
   // }
 
-  async updateEvent(id: string, update: Partial<IEvent>) {
+  async updateEvent(id: string, userId: string, update: Partial<IEvent>) {
     logger.info(`EventService: updateEvent called for id: ${id}`);
-    return this.eventRepository.updateEventById(id, update);
+    const {date, type} = update;
+    return this.eventRepository.updateEventById(id, userId, {
+      ...(date !== undefined && {date}),
+      ...(type !== undefined && {type}),
+    });
   }
 
-  async deleteEvent(id: string) {
+  async deleteEvent(id: string, userId: string) {
     logger.info(`EventService: deleteEvent called for id: ${id}`);
-    return this.eventRepository.deleteEventById(id);
+    return this.eventRepository.deleteEventById(id, userId);
   }
 
   async listEvents(filters: {year?: number; month?: number; type?: string; userId?: string}) {

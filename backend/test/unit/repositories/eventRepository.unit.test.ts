@@ -51,14 +51,14 @@ describe('eventRepository', () => {
       const event: Partial<IEvent> = {id: '1', userId: 'user-1', date: new Date('2024-01-01'), type: 'vacation'};
       eventModel.findOneAndUpdate.mockResolvedValue(event);
 
-      await expect(repository.updateEventById('1', update)).resolves.toEqual(event);
-      expect(eventModel.findOneAndUpdate).toHaveBeenCalledWith({id: '1'}, update, {new: true});
+      await expect(repository.updateEventById('1', 'user-1', update)).resolves.toEqual(event);
+      expect(eventModel.findOneAndUpdate).toHaveBeenCalledWith({id: '1', userId: 'user-1'}, update, {new: true, runValidators: true});
     });
 
     it('returns null when no event is found', async () => {
       eventModel.findOneAndUpdate.mockResolvedValue(null);
 
-      await expect(repository.updateEventById('missing', {})).resolves.toBeNull();
+      await expect(repository.updateEventById('missing', 'user-1', {})).resolves.toBeNull();
     });
   });
 
@@ -67,8 +67,8 @@ describe('eventRepository', () => {
       const event: Partial<IEvent> = {id: '1'};
       eventModel.findOneAndDelete.mockResolvedValue(event);
 
-      await expect(repository.deleteEventById('1')).resolves.toBe(event);
-      expect(eventModel.findOneAndDelete).toHaveBeenCalledWith({id: '1'});
+      await expect(repository.deleteEventById('1', 'user-1')).resolves.toBe(event);
+      expect(eventModel.findOneAndDelete).toHaveBeenCalledWith({id: '1', userId: 'user-1'});
     });
   });
 });

@@ -27,7 +27,7 @@ describe('UserEditModal', () => {
     await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/users/user-1',
+      '/api/users/user-1',
       expect.objectContaining({
         method: 'PATCH',
         body: JSON.stringify({firstName: 'Jonathan', lastName: 'Doe'}),

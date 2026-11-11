@@ -9,8 +9,14 @@ describe('Calendar events', () => {
   it('creates and then deletes an office day, updating the monthly counter', () => {
     cy.contains(/Días de oficina: 0/).should('be.visible');
 
-    // Pick a day far in the past/future-independent way: the first enabled gridcell in the visible month.
-    cy.get('.MuiPickersDay-root:not(.Mui-disabled)').first().click();
+    const today = new Date();
+    const workday = new Date(today.getFullYear(), today.getMonth(), 1);
+    while (workday.getDay() === 0 || workday.getDay() === 6 || workday.getDate() === today.getDate()) {
+      workday.setDate(workday.getDate() + 1);
+    }
+    cy.get('button.MuiPickersDay-root:not(:disabled)')
+      .contains(new RegExp(`^${workday.getDate()}$`))
+      .click();
     cy.contains('button', 'Oficina').click();
 
     cy.contains(/Días de oficina: 1/).should('be.visible');

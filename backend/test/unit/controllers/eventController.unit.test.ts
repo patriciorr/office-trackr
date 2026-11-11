@@ -114,7 +114,7 @@ describe('eventController', () => {
     (EventService.prototype.updateEvent as any).mockResolvedValue(null);
     const res = response();
 
-    await EventController.updateEvent({params: {id: 'missing'}, body: {type: 'office'}} as any, res);
+    await EventController.updateEvent({params: {id: 'missing'}, body: {type: 'office'}, user: {id: 'user-1'}} as any, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({error: 'Event not found'});
@@ -125,8 +125,9 @@ describe('eventController', () => {
     (EventService.prototype.updateEvent as any).mockResolvedValue(event);
     const res = response();
 
-    await EventController.updateEvent({params: {id: 'event-1'}, body: {type: 'office'}} as any, res);
+    await EventController.updateEvent({params: {id: 'event-1'}, body: {type: 'office'}, user: {id: 'user-1'}} as any, res);
 
+    expect(EventService.prototype.updateEvent).toHaveBeenCalledWith('event-1', 'user-1', {type: 'office'});
     expect(emitEventUpdate).toHaveBeenCalledWith('user-1');
     expect(res.json).toHaveBeenCalledWith(event);
   });
@@ -135,7 +136,7 @@ describe('eventController', () => {
     (EventService.prototype.updateEvent as any).mockRejectedValue(new Error('invalid event'));
     const res = response();
 
-    await EventController.updateEvent({params: {id: 'event-1'}, body: {}} as any, res);
+    await EventController.updateEvent({params: {id: 'event-1'}, body: {}, user: {id: 'user-1'}} as any, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({error: 'Error updating event'}));
@@ -145,7 +146,7 @@ describe('eventController', () => {
     (EventService.prototype.deleteEvent as any).mockResolvedValue({id: 'event-1', userId: 'user-1'});
     const res = response();
 
-    await EventController.deleteEvent({params: {id: 'event-1'}} as any, res);
+    await EventController.deleteEvent({params: {id: 'event-1'}, user: {id: 'user-1'}} as any, res);
 
     expect(res.status).toHaveBeenCalledWith(204);
     expect(res.send).toHaveBeenCalled();
@@ -155,7 +156,7 @@ describe('eventController', () => {
     (EventService.prototype.deleteEvent as any).mockResolvedValue(null);
     const res = response();
 
-    await EventController.deleteEvent({params: {id: 'missing'}} as any, res);
+    await EventController.deleteEvent({params: {id: 'missing'}, user: {id: 'user-1'}} as any, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({error: 'Event not found'});
@@ -165,7 +166,7 @@ describe('eventController', () => {
     (EventService.prototype.deleteEvent as any).mockRejectedValue(new Error('database unavailable'));
     const res = response();
 
-    await EventController.deleteEvent({params: {id: 'event-1'}} as any, res);
+    await EventController.deleteEvent({params: {id: 'event-1'}, user: {id: 'user-1'}} as any, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({error: 'Error deleting event'}));

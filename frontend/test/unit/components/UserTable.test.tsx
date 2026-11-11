@@ -26,7 +26,7 @@ describe('UserTable', () => {
     await waitFor(() => expect(screen.getByText('alice@example.com')).toBeInTheDocument());
     expect(screen.getByText('bob@example.com')).toBeInTheDocument();
     expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/users?roles=coworker,manager',
+      '/api/users?roles=coworker,manager',
       expect.any(Object)
     );
   });

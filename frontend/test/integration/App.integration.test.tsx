@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import App from '../../src/App';
 import {AuthProvider} from '../../src/context/AuthContext';
@@ -10,6 +10,15 @@ const renderApp = () => render(<AuthProvider><App /></AuthProvider>);
 const validToken = () => buildJwt({id: 'user-1', role: 'coworker', exp: Math.floor(Date.now() / 1000) + 3600});
 
 describe('App (integration)', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('hides registration when disabled for the deployment', () => {
+    vi.stubEnv('VITE_DISABLE_REGISTRATION', 'true');
+    renderApp();
+    expect(screen.queryByText('¿No tienes cuenta? Regístrate')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Entrar'})).toBeInTheDocument();
+  });
+
   it('logs in and shows the calendar view', async () => {
     mockFetchByRoute({
       '/api/auth/login': {token: validToken(), user: {id: 'user-1', firstName: 'John', lastName: 'Doe', role: 'coworker'}},

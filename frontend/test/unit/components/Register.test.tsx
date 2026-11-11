@@ -34,8 +34,8 @@ describe('Register', () => {
     fireEvent.click(screen.getByRole('button', {name: 'Registrarse'}));
 
     await waitFor(() => expect(onRegister).toHaveBeenCalledWith('jwt-token', {id: 'user-1'}));
-    expect(fetch).toHaveBeenNthCalledWith(1, 'http://localhost:5000/api/users/', expect.objectContaining({method: 'POST'}));
-    expect(fetch).toHaveBeenNthCalledWith(2, 'http://localhost:5000/api/auth/login', expect.objectContaining({method: 'POST'}));
+    expect(fetch).toHaveBeenNthCalledWith(1, '/api/users/', expect.objectContaining({method: 'POST'}));
+    expect(fetch).toHaveBeenNthCalledWith(2, '/api/auth/login', expect.objectContaining({method: 'POST'}));
   });
 
   it('shows a mapped error message for a duplicate email (EM003)', async () => {

@@ -68,10 +68,10 @@ describe('EventService (integration)', () => {
   it('updates and deletes events through the repository', async () => {
     const created: any = await service.createEvent({userId: 'user-5', date: new Date('2024-07-01'), type: 'office'});
 
-    const updated: any = await service.updateEvent(created.id, {type: 'vacation'});
+    const updated: any = await service.updateEvent(created.id, 'user-5', {type: 'vacation'});
     expect(updated.type).toBe('vacation');
 
-    const deleted: any = await service.deleteEvent(created.id);
+    const deleted: any = await service.deleteEvent(created.id, 'user-5');
     expect(deleted?.id).toBe(created.id);
 
     const remaining = await service.listEvents({userId: 'user-5'});
