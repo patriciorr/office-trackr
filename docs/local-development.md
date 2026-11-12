@@ -39,10 +39,10 @@ This preserves the local MongoDB volume. Removing the volume permanently deletes
 
 These accounts are seeded by `mongo-init.js` when a new Compose MongoDB volume is initialized:
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Admin | `admin@test.com` | `Patricio@123` |
-| Manager | `manager@test.com` | `Patricio@123` |
+| Role     | Email              | Password       |
+| -------- | ------------------ | -------------- |
+| Admin    | `admin@test.com`   | `Patricio@123` |
+| Manager  | `manager@test.com` | `Patricio@123` |
 | Coworker | `johndoe@test.com` | `Patricio@123` |
 | Coworker | `janedoe@test.com` | `Patricio@123` |
 
@@ -83,8 +83,7 @@ npm --prefix frontend ci
 npm --prefix frontend run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173). Vite proxies `/api` and `/socket.io` to the backend on port
-5000. Public registration is enabled by default and offers the coworker and manager roles. The MongoDB seed and demo
+Open [http://localhost:5173](http://localhost:5173). Vite proxies `/api` and `/socket.io` to the backend on port 5000. Public registration is enabled by default and offers the coworker and manager roles. The MongoDB seed and demo
 accounts from Compose are **not** created by this option.
 
 ### Initial local administrator
