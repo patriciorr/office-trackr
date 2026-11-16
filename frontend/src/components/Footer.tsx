@@ -48,20 +48,24 @@ const Footer: React.FC = () => {
           <IconButton
             color="inherit"
             size="small"
-            href="https://github.com/patriciorr"
-            aria-label="GitHub"
-            sx={{ alignSelf: "center" }}
-          >
-            <GitHubIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            size="small"
             href="https://www.linkedin.com/in/patriciorr/"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="LinkedIn"
             sx={{ alignSelf: "center" }}
           >
             <LinkedInIcon />
+          </IconButton>
+          <IconButton
+            color="inherit"
+            size="small"
+            href="https://github.com/patriciorr"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            sx={{ alignSelf: "center" }}
+          >
+            <GitHubIcon />
           </IconButton>
         </Stack>
         <Typography
@@ -74,7 +78,7 @@ const Footer: React.FC = () => {
             fontSize: "body2.fontSize",
           }}
         >
-          {t("footer_message") + " Patricio Rodríguez Ramírez"}
+          {t("footer_message") + " Patricio Rodríguez"}
         </Typography>
         <Typography
           variant="body2"
@@ -86,11 +90,21 @@ const Footer: React.FC = () => {
           }}
         >
           {"Copyright © " + new Date().getFullYear() + " · "}
-          <Link color="inherit" href="https://github.com/patriciorr/office-trackr/blob/main/LICENSE">
+          <Link
+            color="inherit"
+            href="https://github.com/patriciorr/office-trackr/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             AGPL-3.0
           </Link>
           {" · "}
-          <Link color="inherit" href="https://github.com/patriciorr/office-trackr">
+          <Link
+            color="inherit"
+            href="https://github.com/patriciorr/office-trackr"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {t("source_code")}
           </Link>
         </Typography>

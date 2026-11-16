@@ -12,4 +12,16 @@ describe('Footer', () => {
     expect(screen.getByRole('link', {name: 'AGPL-3.0'}))
       .toHaveAttribute('href', 'https://github.com/patriciorr/office-trackr/blob/main/LICENSE');
   });
+
+  it('opens external websites in a new tab while preserving the email link', () => {
+    renderWithProviders(<Footer />);
+
+    for (const name of ['GitHub', 'LinkedIn', 'AGPL-3.0', 'Código fuente']) {
+      const link = screen.getByRole('link', {name});
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    }
+
+    expect(screen.getByRole('link', {name: 'Email'})).not.toHaveAttribute('target', '_blank');
+  });
 });
