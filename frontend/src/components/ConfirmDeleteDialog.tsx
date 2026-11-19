@@ -9,6 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { errorMessageKey, fetchWithNetworkError } from "../locales/errorMessage";
 
 interface ConfirmDeleteDialogProps {
   user: {
@@ -34,18 +35,18 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/users/${user.id}`, {
+      const res = await fetchWithNetworkError(`/api/users/${user.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       if (!res.ok && res.status !== 204)
-        throw new Error(t("delete_user_failed"));
+        throw new Error();
       if (onDeleted) onDeleted();
       onClose();
-    } catch (e: any) {
-      setError(e.message || t("unknown_error"));
+    } catch (e: unknown) {
+      setError(errorMessageKey(e, "delete_user_failed"));
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
         </Typography>
         {error && (
           <Typography color="error" mt={2}>
-            {error}
+            {t(error)}
           </Typography>
         )}
       </DialogContent>

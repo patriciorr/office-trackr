@@ -3,6 +3,7 @@ import {fireEvent, screen, waitFor} from '@testing-library/react';
 import {renderWithProviders, buildUser} from '../../utils/test-utils';
 import {jsonResponse} from '../../utils/fetchMock';
 import UserEdit from '../../../src/components/UserEdit';
+import i18n from '../../../src/locales/i18n';
 
 const user = buildUser({id: 'user-1', firstName: 'John', lastName: 'Doe'});
 
@@ -24,6 +25,20 @@ describe('UserEdit', () => {
 
     await waitFor(() => expect(screen.getByText('Nombre actualizado correctamente')).toBeInTheDocument());
     expect(updateUser).toHaveBeenCalledWith({firstName: 'Jonathan', lastName: 'Doe'});
+  });
+
+  it('updates an existing success message when the language changes', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({firstName: 'Jonathan', lastName: 'Doe'})));
+    renderWithProviders(<UserEdit />, {user});
+    fireEvent.click(screen.getByRole('button', {name: 'Cambiar nombre'}));
+    await screen.findByText('Nombre actualizado correctamente');
+
+    try {
+      await i18n.changeLanguage('fr');
+      expect(await screen.findByText('Nom mis à jour avec succès')).toBeInTheDocument();
+    } finally {
+      await i18n.changeLanguage('es');
+    }
   });
 
   it('maps a first-name format error (FN003)', async () => {

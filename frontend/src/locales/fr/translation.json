@@ -93,6 +93,8 @@
   "table_rows_per_page": "lignes par page",
   "table_all": "Tout",
   "unknown_error": "Erreur inconnue",
+  "network_error": "Impossible de se connecter au serveur. Vérifiez votre connexion et réessayez.",
+  "fields_required": "Le prénom et le nom sont obligatoires",
   "team_update_failed": "Échec de la mise à jour de l'équipe",
   "delete_user_failed": "Échec de la suppression de l'utilisateur",
   "first_page": "première page",
@@ -103,5 +105,17 @@
   "open_navigation": "Ouvrir la navigation",
   "change_language": "Changer de langue",
   "footer_message": "Fait avec ❤️ par",
-  "source_code": "Code source"
+  "source_code": "Code source",
+  "faq_link": "Questions fréquentes",
+  "faq_title": "Questions fréquentes",
+  "faq_intro": "Réponses sur l’utilisation d’OfficeTrackr et les données traitées par ce prototype.",
+  "faq_prototype_warning": "OfficeTrackr est un prototype personnel pour un portfolio. N’utilisez pas de vrais noms, adresses e-mail ni mots de passe réels ou réutilisés. Les informations envoyées peuvent être transmises à l’application et stockées. Le responsable du projet décline toute responsabilité concernant les données que vous choisissez d’envoyer et de stocker.",
+  "faq_calendar_question": "Comment utiliser le calendrier ?",
+  "faq_calendar_answer": "Sélectionnez une date, puis choisissez Bureau ou Vacances. Pour modifier une entrée existante, sélectionnez cette date et choisissez l’autre type. Utilisez Supprimer pour l’effacer.",
+  "faq_target_question": "Comment l’objectif mensuel de jours au bureau est-il calculé ?",
+  "faq_target_answer": "Pour chaque mois affiché, les jours de semaine sont comptés, sauf ceux indiqués comme jours de vacances. L’objectif correspond à 40 % de ce total, arrondi au jour entier le plus proche (les demis sont arrondis au supérieur). Les jours fériés locaux ne sont pas exclus automatiquement.",
+  "faq_data_question": "Dois-je saisir de vraies informations personnelles ?",
+  "faq_data_answer": "L’inscription demande un prénom, un nom, une adresse e-mail au format valide, un mot de passe et un rôle ; utilisez des valeurs fictives. Les entrées du calendrier enregistrent la date et le type (Bureau ou Vacances) et sont associées à votre compte.",
+  "faq_roles_question": "Quelle est la différence entre un collaborateur et un manager ?",
+  "faq_roles_answer": "Les collaborateurs utilisent le calendrier. Les managers disposent aussi d’un tableau de bord d’équipe affichant le nombre mensuel de jours au bureau et de vacances de chaque membre, et peuvent gérer les membres de l’équipe."
 }

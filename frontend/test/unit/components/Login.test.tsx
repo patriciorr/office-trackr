@@ -3,6 +3,7 @@ import {fireEvent, screen, waitFor} from '@testing-library/react';
 import {renderWithProviders} from '../../utils/test-utils';
 import {jsonResponse} from '../../utils/fetchMock';
 import Login from '../../../src/components/Login';
+import i18n from '../../../src/locales/i18n';
 
 const baseProps = {
   language: 'es' as const,
@@ -16,6 +17,17 @@ const fillForm = (email: string, password: string) => {
 };
 
 describe('Login', () => {
+  it('shows a translated message when a network request fails', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+
+    renderWithProviders(<Login {...baseProps} onLogin={vi.fn()} />);
+    fillForm('john@example.com', 'Password123!');
+    fireEvent.click(screen.getByRole('button', {name: 'Entrar'}));
+
+    await waitFor(() => expect(screen.getByRole('alert'))
+      .toHaveTextContent('No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.'));
+  });
+
   it('calls onLogin with the token and user on success', async () => {
     const onLogin = vi.fn();
     vi.stubGlobal(
@@ -57,13 +69,35 @@ describe('Login', () => {
     await waitFor(() => expect(screen.getByText('Credenciales inválidas')).toBeInTheDocument());
   });
 
-  it('shows the raw error message for unmapped errors', async () => {
+  it('shows a translated fallback for unmapped server errors', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({error: 'Network exploded'}, {ok: false})));
 
     renderWithProviders(<Login {...baseProps} onLogin={vi.fn()} />);
     fillForm('john@example.com', 'Password123!');
     fireEvent.click(screen.getByRole('button', {name: 'Entrar'}));
 
-    await waitFor(() => expect(screen.getByText('Network exploded')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Error al iniciar sesión')).toBeInTheDocument());
+    expect(screen.queryByText('Network exploded')).not.toBeInTheDocument();
+  });
+
+  it('updates an existing network error in all supported languages', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+    renderWithProviders(<Login {...baseProps} onLogin={vi.fn()} />);
+    fillForm('john@example.com', 'Password123!');
+    fireEvent.click(screen.getByRole('button', {name: 'Entrar'}));
+
+    await screen.findByText('No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.');
+    try {
+      for (const [language, message] of [
+        ['en', 'Could not connect to the server. Check your connection and try again.'],
+        ['fr', 'Impossible de se connecter au serveur. Vérifiez votre connexion et réessayez.'],
+        ['pt', 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.'],
+      ]) {
+        await i18n.changeLanguage(language);
+        expect(await screen.findByText(message)).toBeInTheDocument();
+      }
+    } finally {
+      await i18n.changeLanguage('es');
+    }
   });
 });

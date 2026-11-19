@@ -11,6 +11,7 @@ import InputLabel from "@mui/material/InputLabel";
 import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
 import { surfaceColors } from "../themeColors";
+import { errorMessageKey, fetchWithNetworkError } from "../locales/errorMessage";
 
 interface RegisterProps {
   onRegister: (token: string, user: any) => void;
@@ -60,8 +61,9 @@ const Register: React.FC<RegisterProps> = ({
     setError("");
     setSuccess("");
     setLoading(true);
+    let fallback = "register_failed";
     try {
-      const res = await fetch("/api/users/", {
+      const res = await fetchWithNetworkError("/api/users/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -73,44 +75,19 @@ const Register: React.FC<RegisterProps> = ({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || t("register_failed"));
+      if (!res.ok) throw new Error(data.error);
 
-      const loginRes = await fetch("/api/auth/login", {
+      fallback = "login_failed";
+      const loginRes = await fetchWithNetworkError("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
       const loginData = await loginRes.json();
-      if (!loginRes.ok) throw new Error(loginData.error || t("login_failed"));
+      if (!loginRes.ok) throw new Error(loginData.error);
       onRegister(loginData.token, loginData.user);
-    } catch (err: any) {
-      if (err.message.includes("FN001")) {
-        setError(t("first_name_required"));
-      } else if (err.message.includes("FN002")) {
-        setError(t("first_name_length"));
-      } else if (err.message.includes("FN003")) {
-        setError(t("first_name_format"));
-      } else if (err.message.includes("LN001")) {
-        setError(t("last_name_required"));
-      } else if (err.message.includes("LN002")) {
-        setError(t("last_name_length"));
-      } else if (err.message.includes("LN003")) {
-        setError(t("last_name_format"));
-      } else if (err.message.includes("EM001")) {
-        setError(t("email_required"));
-      } else if (err.message.includes("EM002")) {
-        setError(t("email_format"));
-      } else if (err.message.includes("EM003")) {
-        setError(t("email_registered"));
-      } else if (err.message.includes("PW001")) {
-        setError(t("password_required"));
-      } else if (err.message.includes("PW002")) {
-        setError(t("password_strength"));
-      } else if (err.message.includes("PW003")) {
-        setError(t("password_common"));
-      } else {
-        setError(err.message);
-      }
+    } catch (err: unknown) {
+      setError(errorMessageKey(err, fallback));
       setLoading(false);
     }
   };
@@ -223,12 +200,12 @@ const Register: React.FC<RegisterProps> = ({
         </FormControl>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
+            {t(error)}
           </Alert>
         )}
         {success && (
           <Alert severity="success" sx={{ mb: 2 }}>
-            {success}
+            {t(success)}
           </Alert>
         )}
         <Button

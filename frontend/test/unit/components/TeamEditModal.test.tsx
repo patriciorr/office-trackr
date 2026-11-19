@@ -63,4 +63,15 @@ describe('TeamEditModal', () => {
 
     await waitFor(() => expect(screen.getByText('Error al actualizar el equipo')).toBeInTheDocument());
   });
+
+  it('translates a network failure when saving the team', async () => {
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce(jsonResponse(coworkers))
+      .mockRejectedValueOnce(new TypeError('Failed to fetch')));
+    renderWithProviders(<TeamEditModal user={manager} onClose={() => {}} />);
+    await screen.findByText('Alice Anderson');
+    fireEvent.click(screen.getByRole('button', {name: 'Guardar'}));
+
+    expect(await screen.findByText('No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.')).toBeInTheDocument();
+  });
 });

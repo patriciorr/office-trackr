@@ -5,6 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { Link as RouterLink } from "react-router-dom";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import EmailIcon from "@mui/icons-material/Email";
@@ -106,6 +107,10 @@ const Footer: React.FC = () => {
             rel="noopener noreferrer"
           >
             {t("source_code")}
+          </Link>
+          {" · "}
+          <Link color="inherit" component={RouterLink} to="/faq">
+            {t("faq_link")}
           </Link>
         </Typography>
       </Container>

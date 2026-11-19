@@ -77,6 +77,24 @@ describe('ManagerDashboard', () => {
     );
   });
 
+  it('shows a translated error when removing a coworker fails', async () => {
+    const fetchMock = routeFetch({
+      '/api/users?ids=coworker-1': [{id: 'coworker-1', firstName: 'Alice', lastName: 'Anderson'}],
+      '/api/events?userId=coworker-1': [],
+      '/api/users?roles=coworker': [],
+    });
+    vi.stubGlobal('fetch', vi.fn((url: string, init?: RequestInit) =>
+      init?.method === 'PATCH'
+        ? Promise.reject(new TypeError('Failed to fetch'))
+        : fetchMock(url, init)
+    ));
+    renderWithProviders(<ManagerDashboard />, {user: manager});
+    await screen.findByText('Alice Anderson');
+    fireEvent.click(screen.getByTestId('CloseIcon').closest('button')!);
+
+    expect(await screen.findByText('No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.')).toBeVisible();
+  });
+
   it('adds selected coworkers to the team from the modal', async () => {
     const fetchMock = routeFetch({
       '/api/users?ids=coworker-1': [{id: 'coworker-1', firstName: 'Alice', lastName: 'Anderson'}],

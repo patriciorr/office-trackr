@@ -52,4 +52,12 @@ describe('ConfirmDeleteDialog', () => {
     await waitFor(() => expect(screen.getByText('Error al eliminar el usuario')).toBeInTheDocument());
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  it('translates a network failure when deleting', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+    renderWithProviders(<ConfirmDeleteDialog user={user} onClose={() => {}} />);
+    fireEvent.click(screen.getByRole('button', {name: 'Eliminar'}));
+
+    expect(await screen.findByText('No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.')).toBeInTheDocument();
+  });
 });
