@@ -48,6 +48,26 @@ describe('Register', () => {
     await waitFor(() => expect(screen.getByText('El correo electrónico ya está registrado')).toBeInTheDocument());
   });
 
+  it('translates a network failure during registration', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+    renderWithProviders(<Register {...baseProps} onRegister={vi.fn()} />);
+    fillForm();
+    fireEvent.click(screen.getByRole('button', {name: 'Registrarse'}));
+
+    expect(await screen.findByText('No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.')).toBeInTheDocument();
+  });
+
+  it('uses the login fallback if automatic login fails after registration', async () => {
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce(jsonResponse({id: 'user-1'}))
+      .mockResolvedValueOnce(jsonResponse({error: 'Internal server error'}, {ok: false})));
+    renderWithProviders(<Register {...baseProps} onRegister={vi.fn()} />);
+    fillForm();
+    fireEvent.click(screen.getByRole('button', {name: 'Registrarse'}));
+
+    expect(await screen.findByText('Error al iniciar sesión')).toBeInTheDocument();
+  });
+
   it('shows a mapped error message for a weak password (PW002)', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({error: 'PW002 - weak password'}, {ok: false})));
 

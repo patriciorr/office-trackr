@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { errorMessageKey, fetchWithNetworkError } from "../locales/errorMessage";
 
 interface User {
   id: string;
@@ -65,7 +66,7 @@ const TeamEditModal: React.FC<TeamEditModalProps> = ({
     setError(null);
     try {
       const newTeam = selected.map((c) => c.id);
-      const res = await fetch(`/api/users/${user.id}`, {
+      const res = await fetchWithNetworkError(`/api/users/${user.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -73,11 +74,11 @@ const TeamEditModal: React.FC<TeamEditModalProps> = ({
         },
         body: JSON.stringify({ team: newTeam }),
       });
-      if (!res.ok) throw new Error(t("team_update_failed"));
+      if (!res.ok) throw new Error();
       if (onSaved) onSaved();
       onClose();
-    } catch (e: any) {
-      setError(e.message || t("unknown_error"));
+    } catch (e: unknown) {
+      setError(errorMessageKey(e, "team_update_failed"));
     } finally {
       setLoading(false);
     }
@@ -110,7 +111,7 @@ const TeamEditModal: React.FC<TeamEditModalProps> = ({
         )}
         {error && (
           <Typography color="error" mt={2}>
-            {error}
+            {t(error)}
           </Typography>
         )}
       </DialogContent>

@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import { AuthContext } from "../context/AuthContext";
+import { errorMessageKey, fetchWithNetworkError } from "../locales/errorMessage";
 
 const UserEdit: React.FC = () => {
   const { t } = useTranslation();
@@ -56,7 +57,7 @@ const UserEdit: React.FC = () => {
     setPwSuccess(false);
     setPwLoading(true);
     try {
-      const res = await fetch(`/api/users/${user?.id}`, {
+      const res = await fetchWithNetworkError(`/api/users/${user?.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -69,7 +70,7 @@ const UserEdit: React.FC = () => {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || t("update_failed"));
+      if (!res.ok) throw new Error(data.error);
       setPwSuccess(true);
       setOldPassword("");
       setNewPassword("");
@@ -81,26 +82,8 @@ const UserEdit: React.FC = () => {
         number: false,
         symbol: false,
       });
-    } catch (err: any) {
-      if (err.message.includes("PW001")) {
-        setPwError(t("password_required"));
-      } else if (err.message.includes("PW002")) {
-        setPwError(t("password_strength"));
-      } else if (err.message.includes("PW003")) {
-        setPwError(t("password_common"));
-      } else if (err.message.includes("PW004")) {
-        setPwError(t("password_all_required"));
-      } else if (err.message.includes("PW005")) {
-        setPwError(t("password_mismatch"));
-      } else if (err.message.includes("PW006")) {
-        setPwError(t("user_not_found"));
-      } else if (err.message.includes("PW007")) {
-        setPwError(t("old_password_incorrect"));
-      } else if (err.message.includes("PW008")) {
-        setPwError(t("direct_password_failed"));
-      } else {
-        setPwError(t("password_update_failed"));
-      }
+    } catch (err: unknown) {
+      setPwError(errorMessageKey(err, "password_update_failed"));
     } finally {
       setPwLoading(false);
     }
@@ -111,12 +94,12 @@ const UserEdit: React.FC = () => {
     setError("");
     setSuccess(false);
     if (!firstName.trim() || !lastName.trim()) {
-      setError(t("fields_required"));
+      setError("fields_required");
       return;
     }
     setLoading(true);
     try {
-      const res = await fetch(`/api/users/${user?.id}`, {
+      const res = await fetchWithNetworkError(`/api/users/${user?.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -128,22 +111,8 @@ const UserEdit: React.FC = () => {
       const updated = await res.json();
       updateUser(updated);
       setSuccess(true);
-    } catch (err: any) {
-      if (err.message.includes("FN001")) {
-        setError(t("first_name_required"));
-      } else if (err.message.includes("FN002")) {
-        setError(t("first_name_length"));
-      } else if (err.message.includes("FN003")) {
-        setError(t("first_name_format"));
-      } else if (err.message.includes("LN001")) {
-        setError(t("last_name_required"));
-      } else if (err.message.includes("LN002")) {
-        setError(t("last_name_length"));
-      } else if (err.message.includes("LN003")) {
-        setError(t("last_name_format"));
-      } else {
-        setError(t("name_update_failed"));
-      }
+    } catch (err: unknown) {
+      setError(errorMessageKey(err, "name_update_failed"));
     } finally {
       setLoading(false);
     }
@@ -195,7 +164,7 @@ const UserEdit: React.FC = () => {
         />
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
+            {t(error)}
           </Alert>
         )}
         {success && (
@@ -276,7 +245,7 @@ const UserEdit: React.FC = () => {
         </Box>
         {pwError && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {pwError}
+            {t(pwError)}
           </Alert>
         )}
         {pwSuccess && (

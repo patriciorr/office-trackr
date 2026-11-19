@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import Typography from "@mui/material/Typography";
 import { surfaceColors } from "../themeColors";
+import { errorMessageKey, fetchWithNetworkError } from "../locales/errorMessage";
 
 interface LoginProps {
   onLogin: (token: string, user: any) => void;
@@ -34,22 +35,16 @@ const Login: React.FC<LoginProps> = ({
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetchWithNetworkError("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || t("login_failed"));
+      if (!res.ok) throw new Error(data.error);
       onLogin(data.token, data.user);
-    } catch (err: any) {
-      if (err.message.includes("AUTH001")) {
-        setError(t("user_not_found"));
-      } else if (err.message.includes("AUTH002")) {
-        setError(t("invalid_credentials"));
-      } else {
-        setError(err.message);
-      }
+    } catch (err: unknown) {
+      setError(errorMessageKey(err, "login_failed"));
     } finally {
       setLoading(false);
     }
@@ -101,7 +96,7 @@ const Login: React.FC<LoginProps> = ({
         />
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
+            {t(error)}
           </Alert>
         )}
         <Button

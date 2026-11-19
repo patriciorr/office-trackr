@@ -93,6 +93,8 @@
   "table_rows_per_page": "linhas por página",
   "table_all": "Todas",
   "unknown_error": "Erro desconhecido",
+  "network_error": "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.",
+  "fields_required": "Nome e sobrenome são obrigatórios",
   "team_update_failed": "Falha ao atualizar a equipe",
   "delete_user_failed": "Falha ao excluir o usuário",
   "first_page": "primeira página",
@@ -103,5 +105,17 @@
   "open_navigation": "Abrir navegação",
   "change_language": "Mudar idioma",
   "footer_message": "Feito com ❤️ por",
-  "source_code": "Código-fonte"
+  "source_code": "Código-fonte",
+  "faq_link": "Perguntas frequentes",
+  "faq_title": "Perguntas frequentes",
+  "faq_intro": "Respostas sobre o uso do OfficeTrackr e os dados tratados por este protótipo.",
+  "faq_prototype_warning": "O OfficeTrackr é um protótipo pessoal para um portfólio. Não insira nomes, endereços de e-mail nem senhas reais ou reutilizadas. As informações enviadas podem ser transmitidas ao aplicativo e armazenadas. O responsável pelo projeto não assume responsabilidade pelos dados que você decidir enviar e armazenar.",
+  "faq_calendar_question": "Como uso o calendário?",
+  "faq_calendar_answer": "Selecione uma data e escolha Escritório ou Férias. Para alterar um registro existente, selecione essa data e escolha o outro tipo. Use Excluir para removê-lo.",
+  "faq_target_question": "Como a meta mensal de dias no escritório é calculada?",
+  "faq_target_answer": "Em cada mês exibido, são contados os dias de semana, exceto os marcados como férias. A meta é 40% desse total, arredondada para o dia inteiro mais próximo (meio dia é arredondado para cima). Feriados locais não são excluídos automaticamente.",
+  "faq_data_question": "Preciso inserir informações pessoais reais?",
+  "faq_data_answer": "O cadastro exige nome, sobrenome, e-mail em formato válido, senha e função; use valores fictícios. Os registros do calendário armazenam a data e o tipo (Escritório ou Férias) e são vinculados à sua conta.",
+  "faq_roles_question": "Qual é a diferença entre colaborador e gerente?",
+  "faq_roles_answer": "Colaboradores usam o calendário. Gerentes também têm um painel da equipe que mostra as contagens mensais de dias no escritório e férias de cada integrante e permite gerenciar a equipe."
 }

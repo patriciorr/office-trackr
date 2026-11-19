@@ -10,6 +10,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { errorMessageKey, fetchWithNetworkError } from "../locales/errorMessage";
 
 interface UserEditModalProps {
   user: {
@@ -39,7 +40,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
     setError(null);
     try {
       const body: any = { firstName, lastName };
-      const res = await fetch(`/api/users/${user.id}`, {
+      const res = await fetchWithNetworkError(`/api/users/${user.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -47,11 +48,11 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
         },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error(t("name_update_failed"));
+      if (!res.ok) throw new Error();
       if (onSaved) onSaved();
       onClose();
-    } catch (e: any) {
-      setError(e.message || t("unknown_error"));
+    } catch (e: unknown) {
+      setError(errorMessageKey(e, "name_update_failed"));
     } finally {
       setLoading(false);
     }
@@ -74,7 +75,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
             onChange={(e) => setLastName(e.target.value)}
             fullWidth
           />
-          {error && <Box color="error.main">{error}</Box>}
+          {error && <Box color="error.main">{t(error)}</Box>}
         </Box>
       </DialogContent>
       <DialogActions>

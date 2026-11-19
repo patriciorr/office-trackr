@@ -93,6 +93,8 @@
   "table_rows_per_page": "filas por página",
   "table_all": "Todos",
   "unknown_error": "Error desconocido",
+  "network_error": "No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.",
+  "fields_required": "El nombre y el apellido son obligatorios",
   "team_update_failed": "Error al actualizar el equipo",
   "delete_user_failed": "Error al eliminar el usuario",
   "first_page": "primera página",
@@ -103,5 +105,17 @@
   "open_navigation": "Abrir navegación",
   "change_language": "Cambiar idioma",
   "footer_message": "Hecho con ❤️ por",
-  "source_code": "Código fuente"
+  "source_code": "Código fuente",
+  "faq_link": "Preguntas frecuentes",
+  "faq_title": "Preguntas frecuentes",
+  "faq_intro": "Respuestas sobre el uso de OfficeTrackr y los datos de este prototipo.",
+  "faq_prototype_warning": "OfficeTrackr es un prototipo personal para un portfolio. No introduzcas nombres, direcciones de correo electrónico ni contraseñas reales o reutilizadas. Los datos que envíes pueden transmitirse a la aplicación y almacenarse. El responsable del proyecto no asume responsabilidad por los datos que decidas enviar y almacenar.",
+  "faq_calendar_question": "¿Cómo uso el calendario?",
+  "faq_calendar_answer": "Selecciona una fecha y elige Oficina o Vacaciones. Para cambiar una entrada existente, selecciona esa fecha y elige el otro tipo. Usa Eliminar para borrarla.",
+  "faq_target_question": "¿Cómo se calcula el objetivo mensual de días de oficina?",
+  "faq_target_answer": "En cada mes mostrado se cuentan los días de lunes a viernes, excepto los que hayas marcado como vacaciones. El objetivo es el 40 % de ese total, redondeado al día entero más cercano (los medios días se redondean hacia arriba). Los festivos locales no se excluyen automáticamente.",
+  "faq_data_question": "¿Tengo que introducir datos personales reales?",
+  "faq_data_answer": "El registro requiere nombre, apellido, email con formato válido, contraseña y rol; utiliza valores ficticios. El calendario guarda la fecha y el tipo de cada entrada (Oficina o Vacaciones), asociados a tu cuenta.",
+  "faq_roles_question": "¿Qué diferencia hay entre empleado y manager?",
+  "faq_roles_answer": "Los empleados usan el calendario. Los managers también tienen un panel de equipo que muestra los recuentos mensuales de días de oficina y vacaciones por integrante, y pueden gestionar el equipo."
 }

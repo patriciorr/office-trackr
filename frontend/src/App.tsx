@@ -13,6 +13,7 @@ import Calendar, { CalendarEvent } from "./components/Calendar";
 import DayEventModal from "./components/DayEventModal";
 import DayEventPanel from "./components/DayEventPanel";
 import Navbar from "./components/Navbar";
+import FAQPage from "./components/FAQPage";
 import UserEdit from "./components/UserEdit";
 import { AuthContext } from "./context/AuthContext";
 import ManagerDashboard from "./components/ManagerDashboard";
@@ -140,11 +141,11 @@ const App: React.FC = () => {
         const now = Date.now();
         if (expMs < now) {
           handleLogout();
-          setFeedback({ type: "error", message: t("expired") });
+          setFeedback({ type: "error", message: "expired" });
         } else {
           const timeout = setTimeout(() => {
             handleLogout();
-            setFeedback({ type: "error", message: t("expired") });
+            setFeedback({ type: "error", message: "expired" });
           }, expMs - now);
           return () => clearTimeout(timeout);
         }
@@ -212,7 +213,7 @@ const App: React.FC = () => {
       if (!res.ok) throw new Error("Error guardando evento");
       setFeedback({
         type: "success",
-        message: t("event_saved"),
+        message: "event_saved",
       });
 
       const params = new URLSearchParams({
@@ -228,7 +229,7 @@ const App: React.FC = () => {
       );
       setMonthEvents(await updated.json());
     } catch {
-      setFeedback({ type: "error", message: t("event_error") });
+      setFeedback({ type: "error", message: "event_error" });
     }
     if (isSmallScreen) {
       setModalOpen(false);
@@ -243,7 +244,7 @@ const App: React.FC = () => {
     if (!token || !user) return;
     try {
       if (!eventToDelete?.id) {
-        setFeedback({ type: "error", message: t("delete_error") });
+        setFeedback({ type: "error", message: "delete_error" });
         return;
       }
       const res = await fetch(
@@ -259,7 +260,7 @@ const App: React.FC = () => {
       );
       setFeedback({
         type: "success",
-        message: t("event_deleted"),
+        message: "event_deleted",
       });
 
       const params = new URLSearchParams({
@@ -276,7 +277,7 @@ const App: React.FC = () => {
       );
       setMonthEvents(await updated.json());
     } catch {
-      setFeedback({ type: "error", message: t("delete_error") });
+      setFeedback({ type: "error", message: "delete_error" });
     }
     if (isSmallScreen) {
       setModalOpen(false);
@@ -336,53 +337,86 @@ const App: React.FC = () => {
       <Router>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Container maxWidth="sm" sx={{ py: 4 }}>
-            {showRegister ? (
-              <>
-                <Register
-                  onRegister={handleRegister}
-                  language={language}
-                  onLanguageChange={(lang) => {
-                    setLanguage(lang);
-                    i18n.changeLanguage(lang);
-                  }}
-                  isDarkMode={isDarkMode}
-                  onToggleDarkMode={() => setIsDarkMode((v) => !v)}
-                />
-                <Button
-                  variant="text"
-                  onClick={() => setShowRegister(false)}
-                  sx={{ mt: 2 }}
-                >
-                  {t("already_have_account")}
-                </Button>
-                <Footer isDarkMode={isDarkMode} language={language} />
-              </>
-            ) : (
-              <>
-                <Login
-                  onLogin={handleLogin}
-                  language={language}
-                  onLanguageChange={(lang) => {
-                    setLanguage(lang);
-                    i18n.changeLanguage(lang);
-                  }}
-                  isDarkMode={isDarkMode}
-                  onToggleDarkMode={() => setIsDarkMode((v) => !v)}
-                />
-                {import.meta.env.VITE_DISABLE_REGISTRATION !== "true" && (
-                  <Button
-                    variant="text"
-                    onClick={() => setShowRegister(true)}
-                    sx={{ mt: 2 }}
-                  >
-                    {t("no_account")}
-                  </Button>
-                )}
-                <Footer isDarkMode={isDarkMode} language={language} />
-              </>
-            )}
-          </Container>
+          <Box
+            sx={{
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Routes>
+              <Route
+                path="/faq"
+                element={
+                  <>
+                    <Navbar
+                      isDarkMode={isDarkMode}
+                      onToggleDarkMode={() => setIsDarkMode((v) => !v)}
+                      language={language}
+                      onLanguageChange={(lang) => {
+                        setLanguage(lang);
+                        i18n.changeLanguage(lang);
+                      }}
+                      minimal
+                    />
+                    <FAQPage />
+                  </>
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <Container maxWidth="sm" sx={{ py: 4, flexGrow: 1 }}>
+                    {showRegister ? (
+                      <>
+                        <Register
+                          onRegister={handleRegister}
+                          language={language}
+                          onLanguageChange={(lang) => {
+                            setLanguage(lang);
+                            i18n.changeLanguage(lang);
+                          }}
+                          isDarkMode={isDarkMode}
+                          onToggleDarkMode={() => setIsDarkMode((v) => !v)}
+                        />
+                        <Button
+                          variant="text"
+                          onClick={() => setShowRegister(false)}
+                          sx={{ mt: 2 }}
+                        >
+                          {t("already_have_account")}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Login
+                          onLogin={handleLogin}
+                          language={language}
+                          onLanguageChange={(lang) => {
+                            setLanguage(lang);
+                            i18n.changeLanguage(lang);
+                          }}
+                          isDarkMode={isDarkMode}
+                          onToggleDarkMode={() => setIsDarkMode((v) => !v)}
+                        />
+                        {import.meta.env.VITE_DISABLE_REGISTRATION !==
+                          "true" && (
+                          <Button
+                            variant="text"
+                            onClick={() => setShowRegister(true)}
+                            sx={{ mt: 2 }}
+                          >
+                            {t("no_account")}
+                          </Button>
+                        )}
+                      </>
+                    )}
+                  </Container>
+                }
+              />
+            </Routes>
+            <Footer />
+          </Box>
         </ThemeProvider>
       </Router>
     );
@@ -503,6 +537,7 @@ const App: React.FC = () => {
             }
           />
           <Route path="/edit-user" element={<UserEdit />} />
+          <Route path="/faq" element={<FAQPage />} />
           <Route
             path="/dashboard"
             element={
@@ -524,10 +559,7 @@ const App: React.FC = () => {
             }
           />
         </Routes>
-        <Footer
-          isDarkMode={isDarkMode}
-          language={language}
-        />
+        <Footer />
         <Snackbar
           open={!!feedback}
           autoHideDuration={4000}
@@ -536,7 +568,7 @@ const App: React.FC = () => {
         >
           {feedback ? (
             <Alert severity={feedback.type} sx={{ width: "100%" }}>
-              {feedback.message}
+              {t(feedback.message)}
             </Alert>
           ) : undefined}
         </Snackbar>

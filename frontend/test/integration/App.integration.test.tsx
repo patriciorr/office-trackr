@@ -10,13 +10,39 @@ const renderApp = () => render(<AuthProvider><App /></AuthProvider>);
 const validToken = () => buildJwt({id: 'user-1', role: 'coworker', exp: Math.floor(Date.now() / 1000) + 3600});
 
 describe('App (integration)', () => {
-  afterEach(() => vi.unstubAllEnvs());
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    window.history.replaceState({}, '', '/');
+  });
 
   it('hides registration when disabled for the deployment', () => {
     vi.stubEnv('VITE_DISABLE_REGISTRATION', 'true');
     renderApp();
     expect(screen.queryByText('¿No tienes cuenta? Regístrate')).not.toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Entrar'})).toBeInTheDocument();
+  });
+
+  it('lets signed-out visitors open the FAQ from the footer', async () => {
+    renderApp();
+
+    fireEvent.click(screen.getByRole('link', {name: 'Preguntas frecuentes'}));
+
+    expect(await screen.findByRole('heading', {name: 'Preguntas frecuentes', level: 1}))
+      .toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('No introduzcas nombres');
+  });
+
+  it('lets signed-in users open the FAQ from the footer', async () => {
+    window.localStorage.setItem('token', validToken());
+    window.localStorage.setItem('user', JSON.stringify({id: 'user-1', firstName: 'John', lastName: 'Doe', role: 'coworker'}));
+    mockFetchByRoute({'/api/events': []});
+
+    renderApp();
+    await waitFor(() => expect(screen.getByText('Resumen mensual')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('link', {name: 'Preguntas frecuentes'}));
+
+    expect(await screen.findByRole('heading', {name: 'Preguntas frecuentes', level: 1}))
+      .toBeInTheDocument();
   });
 
   it('logs in and shows the calendar view', async () => {

@@ -93,6 +93,8 @@
   "table_rows_per_page": "rows per page",
   "table_all": "All",
   "unknown_error": "Unknown error",
+  "network_error": "Could not connect to the server. Check your connection and try again.",
+  "fields_required": "First name and last name are required",
   "team_update_failed": "Failed to update team",
   "delete_user_failed": "Failed to delete user",
   "first_page": "first page",
@@ -103,5 +105,17 @@
   "open_navigation": "Open navigation",
   "change_language": "Change language",
   "footer_message": "Made with ❤️ by",
-  "source_code": "Source code"
+  "source_code": "Source code",
+  "faq_link": "Frequently asked questions",
+  "faq_title": "Frequently asked questions",
+  "faq_intro": "Answers about using OfficeTrackr and the data handled by this prototype.",
+  "faq_prototype_warning": "OfficeTrackr is a personal portfolio prototype. Do not enter real names, email addresses, or real or reused passwords. Information you submit may be transmitted to and stored by the app. The project maintainer does not assume responsibility for data you choose to submit and store.",
+  "faq_calendar_question": "How do I use the calendar?",
+  "faq_calendar_answer": "Select a date and choose Office or Vacation. To change an existing entry, select that date and choose the other type. Use Delete to remove it.",
+  "faq_target_question": "How is the monthly office-day target calculated?",
+  "faq_target_answer": "For each displayed month, weekdays are counted except for days marked as vacation. The target is 40% of that total, rounded to the nearest whole day (half days round up). Local public holidays are not excluded automatically.",
+  "faq_data_question": "Do I need to enter real personal information?",
+  "faq_data_answer": "Registration requires a first name, last name, email in a valid format, password, and role; use fictional values. Calendar entries store the date and type (Office or Vacation) and are linked to your account.",
+  "faq_roles_question": "What is the difference between a coworker and a manager?",
+  "faq_roles_answer": "Coworkers use the calendar. Managers also have a team dashboard showing each member's monthly office and vacation counts, and can manage team membership."
 }

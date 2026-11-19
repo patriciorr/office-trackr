@@ -22,6 +22,7 @@ import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrow
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { useTranslation } from "react-i18next";
+import { errorMessageKey, fetchWithNetworkError } from "../locales/errorMessage";
 import i18n from "i18next";
 import { eventColors } from "../themeColors";
 import { surfaceColors } from "../themeColors";
@@ -208,9 +209,10 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 
   const handleRemoveCoworker = async (id: string) => {
     setLoadingId(id);
+    setError(null);
     try {
       const newTeam = user!.team!.filter((uid) => uid !== id);
-      const res = await fetch(`/api/users/${user!.id}`, {
+      const res = await fetchWithNetworkError(`/api/users/${user!.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -218,11 +220,11 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
         },
         body: JSON.stringify({ team: newTeam }),
       });
-      if (!res.ok) throw new Error("Error actualizando equipo");
+      if (!res.ok) throw new Error();
       const updated = await res.json();
       setUser(updated);
-    } catch (e: any) {
-      setError(e.message || "Error desconocido");
+    } catch (e: unknown) {
+      setError(errorMessageKey(e, "team_update_failed"));
     } finally {
       setLoadingId(null);
     }
@@ -242,12 +244,20 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
         boxShadow: 3,
       }}
     >
+      {error && !modalOpen && (
+        <Typography color="error" role="alert">
+          {t(error)}
+        </Typography>
+      )}
       {(coworkers.length === 0 || availableCoworkers.length > 0) && (
         <Box sx={{ display: "flex", justifyContent: "center", mb: { xs: 0, md: 1 } }}>
           <Button
             variant="contained"
             startIcon={<PersonAddAlt1Icon />}
-            onClick={() => setModalOpen(true)}
+            onClick={() => {
+              setError(null);
+              setModalOpen(true);
+            }}
             sx={{
               minHeight: 44,
               px: { xs: 2, sm: 3 },
@@ -383,7 +393,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 setError(null);
                 try {
                   const newTeam = [...user?.team!, ...selectedCoworkers];
-                  const res = await fetch(
+                  const res = await fetchWithNetworkError(
                     `/api/users/${user!.id}`,
                     {
                       method: "PATCH",
@@ -396,13 +406,13 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                       body: JSON.stringify({ team: newTeam }),
                     },
                   );
-                  if (!res.ok) throw new Error("Error actualizando equipo");
+                  if (!res.ok) throw new Error();
                   const updated = await res.json();
                   setUser(updated);
                   setModalOpen(false);
                   setSelectedCoworkers([]);
-                } catch (e: any) {
-                  setError(e.message || "Error desconocido");
+                } catch (e: unknown) {
+                  setError(errorMessageKey(e, "team_update_failed"));
                 } finally {
                   setLoading(false);
                 }
@@ -415,7 +425,7 @@ const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
           </Box>
           {error && (
             <Typography color="error" mt={2}>
-              {error}
+              {t(error)}
             </Typography>
           )}
         </Box>

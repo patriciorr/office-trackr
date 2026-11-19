@@ -47,6 +47,14 @@ describe('UserEditModal', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  it('translates a network failure while saving', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+    renderWithProviders(<UserEditModal user={user} onClose={() => {}} />);
+    fireEvent.click(screen.getByRole('button', {name: 'Guardar'}));
+
+    expect(await screen.findByText('No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.')).toBeInTheDocument();
+  });
+
   it('calls onClose when cancel is clicked', () => {
     const onClose = vi.fn();
     renderWithProviders(<UserEditModal user={user} onClose={onClose} />);

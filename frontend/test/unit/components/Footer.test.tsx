@@ -13,6 +13,13 @@ describe('Footer', () => {
       .toHaveAttribute('href', 'https://github.com/patriciorr/office-trackr/blob/main/LICENSE');
   });
 
+  it('links to the FAQ page', () => {
+    renderWithProviders(<Footer />);
+
+    expect(screen.getByRole('link', {name: 'Preguntas frecuentes'}))
+      .toHaveAttribute('href', '/faq');
+  });
+
   it('opens external websites in a new tab while preserving the email link', () => {
     renderWithProviders(<Footer />);
 
